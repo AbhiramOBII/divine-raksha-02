@@ -1,0 +1,168 @@
+@include('partials.header')
+
+    <!-- Breadcrumb -->
+    <div class="bg-gray-50 border-b border-gray-100">
+        <div class="container max-w-7xl mx-auto px-4 sm:px-6 py-3">
+            <nav class="flex items-center text-sm text-gray-500">
+                <a href="{{ route('home') }}" class="hover:text-royal-blue transition-colors">Home</a>
+                <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                <a href="{{ route('cart.index') }}" class="hover:text-royal-blue transition-colors">Cart</a>
+                <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                <span class="text-royal-blue font-medium">Checkout</span>
+            </nav>
+        </div>
+    </div>
+
+    <section class="py-10 sm:py-14">
+        <div class="container max-w-7xl mx-auto px-4 sm:px-6">
+            <h1 class="text-2xl sm:text-3xl font-venlury font-bold text-royal-blue mb-8">Checkout</h1>
+
+            <!-- Auth Prompt for Guest -->
+            @guest
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6 text-royal-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <p class="text-sm text-gray-700">Already have an account? <a href="{{ route('login') }}?redirect=checkout" class="font-semibold text-royal-blue hover:underline">Login</a> for faster checkout, or continue as guest below.</p>
+                    </div>
+                    <a href="{{ route('register') }}?redirect=checkout" class="text-sm font-semibold text-royal-blue hover:underline whitespace-nowrap">Create Account</a>
+                </div>
+            @endguest
+
+            <form action="{{ route('checkout.placeOrder') }}" method="POST" class="flex flex-col lg:flex-row gap-8">
+                @csrf
+
+                <!-- Left: Customer & Shipping -->
+                <div class="flex-1 space-y-6">
+                    <!-- Contact Information -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                                <input type="text" name="customer_name" value="{{ old('customer_name', $user->name ?? '') }}" required class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue transition-colors text-sm">
+                                @error('customer_name') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                                <input type="email" name="customer_email" value="{{ old('customer_email', $user->email ?? '') }}" required class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue transition-colors text-sm">
+                                @error('customer_email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                                <input type="tel" name="customer_phone" value="{{ old('customer_phone') }}" required class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue transition-colors text-sm" placeholder="+91 98765 43210">
+                                @error('customer_phone') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Shipping Address</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+                                <textarea name="shipping_address" rows="3" required class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue transition-colors text-sm" placeholder="House/Flat No., Street, Locality">{{ old('shipping_address') }}</textarea>
+                                @error('shipping_address') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                                <input type="text" name="shipping_city" value="{{ old('shipping_city') }}" required class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue transition-colors text-sm">
+                                @error('shipping_city') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">State *</label>
+                                <select name="shipping_state" required class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue transition-colors text-sm">
+                                    <option value="">Select State</option>
+                                    @foreach(['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Delhi','Jammu & Kashmir','Ladakh'] as $state)
+                                        <option value="{{ $state }}" {{ old('shipping_state') === $state ? 'selected' : '' }}>{{ $state }}</option>
+                                    @endforeach
+                                </select>
+                                @error('shipping_state') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
+                                <input type="text" name="shipping_pincode" value="{{ old('shipping_pincode') }}" required maxlength="6" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue transition-colors text-sm" placeholder="600001">
+                                @error('shipping_pincode') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment Method</h3>
+                        <div class="space-y-3" x-data="{ method: '{{ old('payment_method', 'cod') }}' }">
+                            <label class="flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all" :class="method === 'cod' ? 'border-royal-blue bg-royal-blue/5' : 'border-gray-200 hover:border-gray-300'">
+                                <input type="radio" name="payment_method" value="cod" x-model="method" class="w-4 h-4 text-royal-blue focus:ring-royal-blue">
+                                <div class="flex-1">
+                                    <span class="text-sm font-semibold text-gray-900">Cash on Delivery (COD)</span>
+                                    <p class="text-xs text-gray-500">Pay when you receive your order</p>
+                                </div>
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </label>
+                            <label class="flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all" :class="method === 'online' ? 'border-royal-blue bg-royal-blue/5' : 'border-gray-200 hover:border-gray-300'">
+                                <input type="radio" name="payment_method" value="online" x-model="method" class="w-4 h-4 text-royal-blue focus:ring-royal-blue">
+                                <div class="flex-1">
+                                    <span class="text-sm font-semibold text-gray-900">Online Payment</span>
+                                    <p class="text-xs text-gray-500">UPI, Credit/Debit Card, Net Banking</p>
+                                </div>
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                            </label>
+                        </div>
+                        @error('payment_method') <p class="text-xs text-red-500 mt-2">{{ $message }}</p> @enderror
+                    </div>
+
+                    <!-- Order Notes -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Notes (Optional)</h3>
+                        <textarea name="notes" rows="3" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue transition-colors text-sm" placeholder="Any special instructions for your order...">{{ old('notes') }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Right: Order Summary -->
+                <div class="lg:w-96">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+
+                        <!-- Items -->
+                        <div class="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                            @foreach($cartItems as $item)
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                                        <img src="{{ $item['product']->featured_image ? asset('storage/' . $item['product']->featured_image) : asset('images/karungulai.jpg') }}" alt="{{ $item['product']->title }}" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">{{ $item['product']->title }}</p>
+                                        <p class="text-xs text-gray-500">Qty: {{ $item['quantity'] }}</p>
+                                    </div>
+                                    <p class="text-sm font-semibold text-gray-900">₹{{ number_format($item['subtotal']) }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="border-t border-gray-200 pt-4 space-y-3 text-sm">
+                            <div class="flex justify-between text-gray-600">
+                                <span>Subtotal</span>
+                                <span class="font-medium text-gray-900">₹{{ number_format($subtotal) }}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Shipping</span>
+                                <span class="font-medium {{ $shipping == 0 ? 'text-green-600' : 'text-gray-900' }}">{{ $shipping == 0 ? 'FREE' : '₹' . number_format($shipping) }}</span>
+                            </div>
+                            <div class="border-t border-gray-200 pt-3 flex justify-between">
+                                <span class="font-semibold text-gray-900">Total</span>
+                                <span class="font-bold text-xl text-royal-blue">₹{{ number_format($total) }}</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="mt-6 block w-full bg-royal-blue text-white text-center py-4 rounded-full font-semibold hover:bg-deep-royal transition-colors sacred-glow">
+                            Place Order
+                        </button>
+
+                        <p class="text-xs text-gray-500 text-center mt-3">By placing this order, you agree to our Terms & Conditions.</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+@include('partials.footer')
