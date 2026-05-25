@@ -154,7 +154,7 @@
                 <!-- Purpose Icons Grid -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 sm:gap-5 lg:gap-6 max-w-7xl mx-auto">
                     <!-- Wealth -->
-                    <a href="#" class="flex flex-col items-center group">
+                    <a href="{{ route('shop.purpose', 'Wealth') }}" class="flex flex-col items-center group">
                         <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
                             <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
@@ -168,7 +168,7 @@
                     </a>
 
                     <!-- Love -->
-                    <a href="#" class="flex flex-col items-center group">
+                    <a href="{{ route('shop.purpose', 'Love') }}" class="flex flex-col items-center group">
                         <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
                             <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
@@ -182,7 +182,7 @@
                     </a>
 
                     <!-- Health -->
-                    <a href="#" class="flex flex-col items-center group">
+                    <a href="{{ route('shop.purpose', 'Health') }}" class="flex flex-col items-center group">
                         <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
                             <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
@@ -196,7 +196,7 @@
                     </a>
 
                     <!-- Luck -->
-                    <a href="#" class="flex flex-col items-center group">
+                    <a href="{{ route('shop.purpose', 'Luck') }}" class="flex flex-col items-center group">
                         <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
                             <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
@@ -210,7 +210,7 @@
                     </a>
 
                     <!-- Protection -->
-                    <a href="#" class="flex flex-col items-center group">
+                    <a href="{{ route('shop.purpose', 'Protection') }}" class="flex flex-col items-center group">
                         <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
                             <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
@@ -224,7 +224,7 @@
                     </a>
 
                     <!-- Peace -->
-                    <a href="#" class="flex flex-col items-center group">
+                    <a href="{{ route('shop.purpose', 'Peace') }}" class="flex flex-col items-center group">
                         <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
                             <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
@@ -238,7 +238,7 @@
                     </a>
 
                     <!-- Courage -->
-                    <a href="#" class="flex flex-col items-center group">
+                    <a href="{{ route('shop.purpose', 'Courage') }}" class="flex flex-col items-center group">
                         <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
                             <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
@@ -252,7 +252,7 @@
                     </a>
 
                     <!-- Balance -->
-                    <a href="#" class="flex flex-col items-center group">
+                    <a href="{{ route('shop.purpose', 'Balance') }}" class="flex flex-col items-center group">
                         <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
                             <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
