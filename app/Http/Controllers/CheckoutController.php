@@ -122,10 +122,28 @@ class CheckoutController extends Controller
             ]);
         }
 
-        // Clear cart
-        session()->forget('cart');
+        // For COD, clear cart and redirect to success
+        if ($request->payment_method === 'cod') {
+            session()->forget('cart');
 
-        return redirect()->route('checkout.success', $order->order_number);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'payment_method' => 'cod',
+                    'redirect' => route('checkout.success', $order->order_number),
+                ]);
+            }
+
+            return redirect()->route('checkout.success', $order->order_number);
+        }
+
+        // For online payment, return order ID for Razorpay checkout
+        return response()->json([
+            'success' => true,
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'payment_method' => 'online',
+        ]);
     }
 
     public function success($orderNumber)

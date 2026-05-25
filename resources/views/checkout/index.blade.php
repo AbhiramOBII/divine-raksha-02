@@ -28,7 +28,7 @@
                 </div>
             @endguest
 
-            <form action="{{ route('checkout.placeOrder') }}" method="POST" class="flex flex-col lg:flex-row gap-8">
+            <form id="checkout-form" action="{{ route('checkout.placeOrder') }}" method="POST" class="flex flex-col lg:flex-row gap-8" x-data="checkoutForm()" @submit.prevent="handleSubmit">
                 @csrf
 
                 <!-- Left: Customer & Shipping -->
@@ -154,15 +154,172 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="mt-6 block w-full bg-royal-blue text-white text-center py-4 rounded-full font-semibold hover:bg-deep-royal transition-colors sacred-glow">
-                            Place Order
+                        <button type="submit" class="mt-6 block w-full bg-royal-blue text-white text-center py-4 rounded-full font-semibold hover:bg-deep-royal transition-colors sacred-glow disabled:opacity-50 disabled:cursor-not-allowed" :disabled="processing">
+                            <span x-show="!processing">Place Order</span>
+                            <span x-show="processing" class="flex items-center justify-center gap-2">
+                                <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Processing...
+                            </span>
                         </button>
 
                         <p class="text-xs text-gray-500 text-center mt-3">By placing this order, you agree to our Terms & Conditions.</p>
+
+                        <!-- Error message -->
+                        <div x-show="errorMessage" x-cloak class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <p class="text-xs text-red-600 text-center" x-text="errorMessage"></p>
+                        </div>
                     </div>
                 </div>
             </form>
         </div>
     </section>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        function checkoutForm() {
+            return {
+                processing: false,
+                errorMessage: '',
+
+                async handleSubmit() {
+                    this.processing = true;
+                    this.errorMessage = '';
+
+                    const form = document.getElementById('checkout-form');
+                    const formData = new FormData(form);
+                    const paymentMethod = formData.get('payment_method');
+
+                    try {
+                        // Submit the form to create the order
+                        const response = await fetch('{{ route("checkout.placeOrder") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: formData,
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                            // Validation errors
+                            if (data.errors) {
+                                const firstError = Object.values(data.errors)[0][0];
+                                this.errorMessage = firstError;
+                            } else {
+                                this.errorMessage = data.message || 'Something went wrong.';
+                            }
+                            this.processing = false;
+                            return;
+                        }
+
+                        // Handle COD - redirect to success
+                        if (data.payment_method === 'cod') {
+                            window.location.href = data.redirect;
+                            return;
+                        }
+
+                        // If online payment, initiate Razorpay
+                        if (data.payment_method === 'online') {
+                            await this.initiateRazorpay(data.order_id);
+                        }
+                    } catch (error) {
+                        this.errorMessage = 'Network error. Please try again.';
+                        this.processing = false;
+                    }
+                },
+
+                async initiateRazorpay(orderId) {
+                    try {
+                        // Create Razorpay order
+                        const response = await fetch('{{ route("payment.createOrder") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({ order_id: orderId }),
+                        });
+
+                        const data = await response.json();
+
+                        if (!data.success) {
+                            this.errorMessage = 'Failed to create payment order.';
+                            this.processing = false;
+                            return;
+                        }
+
+                        // Open Razorpay Checkout
+                        const options = {
+                            key: data.key,
+                            amount: data.amount,
+                            currency: data.currency,
+                            name: data.name,
+                            description: data.description,
+                            order_id: data.order_id,
+                            prefill: data.prefill,
+                            theme: {
+                                color: '#1a237e',
+                            },
+                            handler: async (response) => {
+                                await this.verifyPayment(response);
+                            },
+                            modal: {
+                                ondismiss: () => {
+                                    this.errorMessage = 'Payment was cancelled. Your order is saved — you can retry payment.';
+                                    this.processing = false;
+                                }
+                            }
+                        };
+
+                        const rzp = new Razorpay(options);
+                        rzp.on('payment.failed', (response) => {
+                            this.errorMessage = 'Payment failed: ' + response.error.description;
+                            this.processing = false;
+                        });
+                        rzp.open();
+                    } catch (error) {
+                        this.errorMessage = 'Failed to initialize payment gateway.';
+                        this.processing = false;
+                    }
+                },
+
+                async verifyPayment(razorpayResponse) {
+                    try {
+                        const response = await fetch('{{ route("payment.verify") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                razorpay_order_id: razorpayResponse.razorpay_order_id,
+                                razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+                                razorpay_signature: razorpayResponse.razorpay_signature,
+                            }),
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            window.location.href = data.redirect;
+                        } else {
+                            this.errorMessage = data.message || 'Payment verification failed.';
+                            if (data.redirect) {
+                                window.location.href = data.redirect;
+                            }
+                            this.processing = false;
+                        }
+                    } catch (error) {
+                        this.errorMessage = 'Verification failed. Please contact support.';
+                        this.processing = false;
+                    }
+                }
+            }
+        }
+    </script>
 
 @include('partials.footer')

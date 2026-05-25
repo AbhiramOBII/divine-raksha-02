@@ -76,7 +76,9 @@ class ProductController extends Controller
         $products = $query->paginate(12)->withQueryString();
 
         // Filter options
-        $categories = Category::active()->orderBy('sort_order')->get();
+        $categories = Category::active()->whereHas('products', function ($q) {
+            $q->where('status', true);
+        })->orderBy('sort_order')->get();
 
         $attributes = ['Natural', 'Blessed', 'Handcrafted', 'Organic'];
         $sizes = ['Small', 'Medium', 'Large', 'Extra Large'];
@@ -142,6 +144,11 @@ class ProductController extends Controller
             'Kumbha'    => ['label' => 'Aquarius',    'symbol' => '♒'],
             'Meena'     => ['label' => 'Pisces',      'symbol' => '♓'],
         ];
+
+        // Normalize to title case so URLs can be lowercase
+        if ($raashi) {
+            $raashi = ucfirst(strtolower($raashi));
+        }
 
         $query = Product::active()->with('category');
 

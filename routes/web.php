@@ -27,6 +27,11 @@ Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.in
 Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
 Route::get('/checkout/success/{orderNumber}', [CheckoutController::class, 'success'])->name('checkout.success');
 
+// Razorpay Payment
+Route::post('/payment/create-order', [App\Http\Controllers\PaymentController::class, 'createOrder'])->name('payment.createOrder');
+Route::post('/payment/verify', [App\Http\Controllers\PaymentController::class, 'verify'])->name('payment.verify');
+Route::get('/payment/failed/{orderNumber}', [App\Http\Controllers\PaymentController::class, 'failed'])->name('payment.failed');
+
 // Sitemap
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 Route::get('/sitemap-pages.xml', [App\Http\Controllers\SitemapController::class, 'pages']);

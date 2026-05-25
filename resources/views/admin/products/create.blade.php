@@ -12,7 +12,7 @@
             Back to Products
         </a>
 
-        <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.products.store') }}" method="POST">
             @csrf
 
             {{-- Section 1: Basic Info --}}
@@ -99,23 +99,97 @@
                 </div>
             </div>
 
-            {{-- Section 3: Images --}}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+            {{-- Section 3: Images (Media Library Picker) --}}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6" x-data="mediaPicker()">
                 <h3 class="text-lg font-semibold text-gray-900 mb-6">Images</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                        <label for="featured_image" class="block text-sm font-medium text-gray-700 mb-2">Featured Image</label>
-                        <input type="file" name="featured_image" id="featured_image" accept="image/jpeg,image/png,image/jpg,image/webp"
-                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-royal-blue/10 file:text-royal-blue hover:file:bg-royal-blue/20">
-                        <p class="mt-1 text-xs text-gray-500">Max 2MB. JPEG, PNG, WebP.</p>
-                        @error('featured_image') <p class="mt-1 text-sm text-divine-red">{{ $message }}</p> @enderror
+
+                <!-- Featured Image -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Featured Image</label>
+                    <input type="hidden" name="featured_image_path" :value="featuredImage">
+                    <div class="flex items-start gap-4">
+                        <div x-show="featuredImage" class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 shrink-0">
+                            <img :src="'/storage/' + featuredImage" class="w-full h-full object-cover">
+                            <button type="button" @click="featuredImage = ''" class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">&times;</button>
+                        </div>
+                        <button type="button" @click="openPicker('featured')"
+                                class="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors inline-flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span x-text="featuredImage ? 'Change Image' : 'Select from Media'"></span>
+                        </button>
                     </div>
-                    <div>
-                        <label for="gallery_images" class="block text-sm font-medium text-gray-700 mb-2">Gallery Images</label>
-                        <input type="file" name="gallery_images[]" id="gallery_images" accept="image/jpeg,image/png,image/jpg,image/webp" multiple
-                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-royal-blue/10 file:text-royal-blue hover:file:bg-royal-blue/20">
-                        <p class="mt-1 text-xs text-gray-500">Select multiple images. Max 2MB each.</p>
-                        @error('gallery_images.*') <p class="mt-1 text-sm text-divine-red">{{ $message }}</p> @enderror
+                    @error('featured_image_path') <p class="mt-1 text-sm text-divine-red">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- Gallery Images -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Gallery Images</label>
+                    <template x-for="(img, index) in galleryImages" :key="index">
+                        <input type="hidden" name="gallery_image_paths[]" :value="img">
+                    </template>
+
+                    <div class="flex flex-wrap gap-3 mb-3" x-show="galleryImages.length > 0">
+                        <template x-for="(img, index) in galleryImages" :key="index">
+                            <div class="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+                                <img :src="'/storage/' + img" class="w-full h-full object-cover">
+                                <button type="button" @click="galleryImages.splice(index, 1)" class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">&times;</button>
+                            </div>
+                        </template>
+                    </div>
+                    <button type="button" @click="openPicker('gallery')"
+                            class="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors inline-flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Add from Media
+                    </button>
+                    @error('gallery_image_paths') <p class="mt-1 text-sm text-divine-red">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- Media Picker Modal -->
+                <div x-show="showPicker" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" @keydown.escape.window="showPicker = false">
+                    <div class="fixed inset-0 bg-black/50" @click="showPicker = false"></div>
+                    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[80vh] flex flex-col" @click.stop>
+                        <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Select from Media Library</h3>
+                            <button type="button" @click="showPicker = false" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+
+                        <!-- Search & Filter -->
+                        <div class="p-4 border-b border-gray-100 flex gap-3">
+                            <input type="text" x-model="searchQuery" @input.debounce.300ms="loadMedia()" placeholder="Search images..."
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+                            <select x-model="folderFilter" @change="loadMedia()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+                                <option value="">All Folders</option>
+                                <template x-for="f in folders" :key="f">
+                                    <option :value="f" x-text="f.charAt(0).toUpperCase() + f.slice(1)"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <!-- Image Grid -->
+                        <div class="flex-1 overflow-y-auto p-4">
+                            <div x-show="loading" class="text-center py-8 text-gray-500">Loading...</div>
+                            <div x-show="!loading && mediaItems.length === 0" class="text-center py-8 text-gray-500">No images found</div>
+                            <div x-show="!loading" class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
+                                <template x-for="item in mediaItems" :key="item.id">
+                                    <div @click="selectMedia(item)"
+                                         class="aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-all hover:shadow-md"
+                                         :class="isSelected(item) ? 'border-royal-blue ring-2 ring-royal-blue/30' : 'border-gray-200 hover:border-gray-400'">
+                                        <img :src="'/storage/' + item.path" :alt="item.original_name" class="w-full h-full object-cover" loading="lazy">
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="p-4 border-t border-gray-200 flex items-center justify-between">
+                            <p class="text-sm text-gray-500"><span x-text="pickerMode === 'gallery' ? tempSelected.length + ' selected' : (tempSelected.length ? '1 selected' : 'None selected')"></span></p>
+                            <div class="flex gap-3">
+                                <button type="button" @click="showPicker = false" class="px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                                <button type="button" @click="confirmSelection()" class="px-4 py-2 text-sm text-white bg-royal-blue rounded-lg hover:bg-deep-royal">Confirm</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -260,4 +334,6 @@
             </div>
         </form>
     </div>
+
+    @include('admin.components.media-picker-script')
 @endsection

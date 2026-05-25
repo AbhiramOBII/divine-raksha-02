@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\BulkUploadController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BlogCategoryController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\StockController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +31,11 @@ Route::middleware('admin.auth')->group(function () {
 
     // Products
     Route::resource('products', ProductController::class)->except(['show'])->names('admin.products');
+
+    // Bulk Upload
+    Route::get('bulk-upload', [BulkUploadController::class, 'index'])->name('admin.bulk-upload.index');
+    Route::get('bulk-upload/template', [BulkUploadController::class, 'template'])->name('admin.bulk-upload.template');
+    Route::post('bulk-upload', [BulkUploadController::class, 'upload'])->name('admin.bulk-upload.upload');
 
     // Stock Management
     Route::get('stocks', [StockController::class, 'index'])->name('admin.stocks.index');
@@ -55,6 +62,14 @@ Route::middleware('admin.auth')->group(function () {
     Route::get('enquiries', [EnquiryController::class, 'index'])->name('admin.enquiries.index');
     Route::get('enquiries/{enquiry}', [EnquiryController::class, 'show'])->name('admin.enquiries.show');
     Route::delete('enquiries/{enquiry}', [EnquiryController::class, 'destroy'])->name('admin.enquiries.destroy');
+
+    // Media Manager
+    Route::get('media', [MediaController::class, 'index'])->name('admin.media.index');
+    Route::get('media/api', [MediaController::class, 'api'])->name('admin.media.api');
+    Route::post('media/upload', [MediaController::class, 'upload'])->name('admin.media.upload');
+    Route::put('media/{medium}', [MediaController::class, 'update'])->name('admin.media.update');
+    Route::delete('media/{medium}', [MediaController::class, 'destroy'])->name('admin.media.destroy');
+    Route::post('media/bulk-delete', [MediaController::class, 'bulkDelete'])->name('admin.media.bulkDelete');
 
     // Site Settings
     Route::get('settings', [SiteSettingController::class, 'index'])->name('admin.settings.index');

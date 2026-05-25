@@ -18,6 +18,8 @@ class SiteSettingController extends Controller
         'social_instagram',
         'social_facebook',
         'social_youtube',
+        'razorpay_key_id',
+        'razorpay_key_secret',
     ];
 
     public function index()
@@ -38,6 +40,8 @@ class SiteSettingController extends Controller
             'social_instagram' => 'nullable|url|max:255',
             'social_facebook' => 'nullable|url|max:255',
             'social_youtube' => 'nullable|url|max:255',
+            'razorpay_key_id' => 'nullable|string|max:255',
+            'razorpay_key_secret' => 'nullable|string|max:255',
         ]);
 
         foreach ($this->settingKeys as $key) {

@@ -55,8 +55,9 @@ class ProductController extends Controller
             'bestseller' => ['nullable', 'boolean'],
             'cost_price' => ['required', 'numeric', 'min:0'],
             'selling_price' => ['required', 'numeric', 'min:0'],
-            'featured_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-            'gallery_images.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'featured_image_path' => ['nullable', 'string', 'max:500'],
+            'gallery_image_paths' => ['nullable', 'array'],
+            'gallery_image_paths.*' => ['nullable', 'string', 'max:500'],
             'attributes' => ['nullable', 'array'],
             'attributes.*' => ['string'],
             'shop_purpose' => ['nullable', 'array'],
@@ -87,19 +88,17 @@ class ProductController extends Controller
             $validated[$field] = !empty($validated[$field]) ? $validated[$field] : null;
         }
 
-        // Handle featured image
-        if ($request->hasFile('featured_image')) {
-            $validated['featured_image'] = $request->file('featured_image')->store('products', 'public');
+        // Handle featured image from media library
+        if ($request->filled('featured_image_path')) {
+            $validated['featured_image'] = $request->input('featured_image_path');
         }
+        unset($validated['featured_image_path']);
 
-        // Handle gallery images
-        if ($request->hasFile('gallery_images')) {
-            $galleryPaths = [];
-            foreach ($request->file('gallery_images') as $image) {
-                $galleryPaths[] = $image->store('products/gallery', 'public');
-            }
-            $validated['gallery_images'] = $galleryPaths;
+        // Handle gallery images from media library
+        if ($request->filled('gallery_image_paths')) {
+            $validated['gallery_images'] = $request->input('gallery_image_paths');
         }
+        unset($validated['gallery_image_paths']);
 
         Product::create($validated);
 
@@ -127,8 +126,9 @@ class ProductController extends Controller
             'bestseller' => ['nullable', 'boolean'],
             'cost_price' => ['required', 'numeric', 'min:0'],
             'selling_price' => ['required', 'numeric', 'min:0'],
-            'featured_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-            'gallery_images.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'featured_image_path' => ['nullable', 'string', 'max:500'],
+            'gallery_image_paths' => ['nullable', 'array'],
+            'gallery_image_paths.*' => ['nullable', 'string', 'max:500'],
             'attributes' => ['nullable', 'array'],
             'attributes.*' => ['string'],
             'shop_purpose' => ['nullable', 'array'],
@@ -159,28 +159,17 @@ class ProductController extends Controller
             $validated[$field] = !empty($validated[$field]) ? $validated[$field] : null;
         }
 
-        // Handle featured image
-        if ($request->hasFile('featured_image')) {
-            if ($product->featured_image) {
-                Storage::disk('public')->delete($product->featured_image);
-            }
-            $validated['featured_image'] = $request->file('featured_image')->store('products', 'public');
+        // Handle featured image from media library
+        if ($request->filled('featured_image_path')) {
+            $validated['featured_image'] = $request->input('featured_image_path');
         }
+        unset($validated['featured_image_path']);
 
-        // Handle gallery images
-        if ($request->hasFile('gallery_images')) {
-            // Delete old gallery images
-            if ($product->gallery_images) {
-                foreach ($product->gallery_images as $oldImage) {
-                    Storage::disk('public')->delete($oldImage);
-                }
-            }
-            $galleryPaths = [];
-            foreach ($request->file('gallery_images') as $image) {
-                $galleryPaths[] = $image->store('products/gallery', 'public');
-            }
-            $validated['gallery_images'] = $galleryPaths;
+        // Handle gallery images from media library
+        if ($request->filled('gallery_image_paths')) {
+            $validated['gallery_images'] = $request->input('gallery_image_paths');
         }
+        unset($validated['gallery_image_paths']);
 
         $product->update($validated);
 

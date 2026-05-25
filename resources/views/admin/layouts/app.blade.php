@@ -126,6 +126,9 @@
                 <a href="{{ route('admin.enquiries.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 {{ request()->routeIs('admin.enquiries.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
                     Enquiries
                 </a>
+                <a href="{{ route('admin.media.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 {{ request()->routeIs('admin.media.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
+                    Media
+                </a>
                 <span class="text-white/20 px-1">|</span>
                 <a href="{{ route('admin.settings.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 {{ request()->routeIs('admin.settings.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
                     Settings
@@ -144,6 +147,7 @@
                     <a href="{{ route('admin.blog-categories.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.blog-categories.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Blog Cat.</a>
                     <a href="{{ route('admin.blogs.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.blogs.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Blogs</a>
                     <a href="{{ route('admin.enquiries.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.enquiries.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Enquiries</a>
+                    <a href="{{ route('admin.media.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.media.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Media</a>
                     <a href="{{ route('admin.settings.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.settings.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Settings</a>
                 </div>
             </nav>

@@ -34,6 +34,9 @@ class Order extends Model
         'total',
         'payment_method',
         'transaction_id',
+        'razorpay_order_id',
+        'razorpay_payment_id',
+        'razorpay_signature',
         'notes',
     ];
 
