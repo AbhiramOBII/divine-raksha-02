@@ -631,7 +631,7 @@
                 <!-- Column 3: Akshay Photo -->
                 <div class="flex justify-center">
                     <div class="relative">
-                        <img src="{{ asset('images/Akshay-vasu.png') }}" alt="Akshay Vasu - Co-Founder" class="w-72 h-72 sm:w-96 sm:h-96 object-cover rounded-lg shadow-lg">
+                        <img src="{{ asset('images/Akshay-vasu-new.png') }}" alt="Akshay Vasu - Co-Founder" class="w-72 h-72 sm:w-96 sm:h-96 object-cover rounded-lg shadow-lg">
                         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-royal-blue/90 to-transparent p-4 rounded-b-lg">
                             <h3 class="text-xl font-venlury font-bold text-pure-white mb-1">Akshay Vasu</h3>
                             <p class="text-sacred-gold font-semibold text-sm">Co-Founder &amp; Business Visionary</p>
