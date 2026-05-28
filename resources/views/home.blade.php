@@ -380,8 +380,8 @@
                         <span class="text-[10px] sm:text-xs text-gray-400">Libra</span>
                     </a>
 
-                    <!-- Vrishchika (Scorpio) -->
-                    <a href="{{ route('shop.raashi', 'vrishchika') }}" class="flex flex-col items-center group">
+                    <!-- Vrischika (Scorpio) -->
+                    <a href="{{ route('shop.raashi', 'vrischika') }}" class="flex flex-col items-center group">
                         <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
                             <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">

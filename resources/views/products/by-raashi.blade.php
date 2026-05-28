@@ -53,7 +53,7 @@
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
                         <p class="text-sm text-gray-600">
                             Showing <span class="font-semibold text-gray-900">{{ $products->total() }}</span> products
-                            @if($raashi)
+                            @if($raashi && isset($raashis[$raashi]))
                                 for <span class="font-semibold text-royal-blue">{{ $raashi }} ({{ $raashis[$raashi]['label'] }})</span>
                             @endif
                         </p>
