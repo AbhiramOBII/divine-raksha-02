@@ -10,7 +10,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::active()->with('category');
+        $query = Product::active()->with('category', 'stocks');
 
         // Filter by bestseller
         if ($request->filled('bestseller')) {
@@ -96,6 +96,7 @@ class ProductController extends Controller
         $product->load('category', 'stocks');
 
         $relatedProducts = Product::active()
+            ->with('stocks')
             ->where('id', '!=', $product->id)
             ->where('category_id', $product->category_id)
             ->limit(6)
@@ -117,7 +118,7 @@ class ProductController extends Controller
             'Balance'    => ['icon' => 'M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm6 9.09c0 4-2.55 7.7-6 8.83-3.45-1.13-6-4.82-6-8.83V6.31l6-2.12 6 2.12v4.78z', 'desc' => 'Harmonize mind, body and spirit'],
         ];
 
-        $query = Product::active()->with('category');
+        $query = Product::active()->with('category', 'stocks');
 
         if ($purpose && array_key_exists($purpose, $purposes)) {
             $query->whereJsonContains('shop_purpose', $purpose);
@@ -150,7 +151,7 @@ class ProductController extends Controller
             $raashi = ucfirst(strtolower($raashi));
         }
 
-        $query = Product::active()->with('category');
+        $query = Product::active()->with('category', 'stocks');
 
         if ($raashi && array_key_exists($raashi, $raashis)) {
             $query->whereJsonContains('shop_by_raashi', $raashi);
@@ -165,7 +166,7 @@ class ProductController extends Controller
     {
         $numbers = range(1, 9);
 
-        $query = Product::active()->with('category');
+        $query = Product::active()->with('category', 'stocks');
 
         if ($number && in_array($number, $numbers)) {
             $query->whereJsonContains('shop_by_numerology', (string) $number);
@@ -178,7 +179,7 @@ class ProductController extends Controller
 
     public function bestsellers()
     {
-        $products = Product::active()->bestseller()->with('category')->latest()->paginate(12);
+        $products = Product::active()->bestseller()->with('category', 'stocks')->latest()->paginate(12);
         return view('products.bestsellers', compact('products'));
     }
 }

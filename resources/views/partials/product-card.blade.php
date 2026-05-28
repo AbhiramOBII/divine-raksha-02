@@ -1,3 +1,4 @@
+@php $cardStock = $product->stocks->sum('quantity'); @endphp
 <div class="group w-full" x-data="{ adding: false, added: false }">
     <div class="relative overflow-hidden rounded-xl bg-white shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
         <a href="{{ route('products.show', $product->slug) }}" class="block">
@@ -11,6 +12,12 @@
                         <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
+                    </div>
+                @endif
+
+                @if($cardStock <= 0)
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <span class="px-3 py-1.5 bg-white/90 text-divine-red text-sm font-bold rounded-lg">Out of Stock</span>
                     </div>
                 @endif
 
@@ -40,40 +47,47 @@
 
         <!-- Add to Cart Button -->
         <div class="px-4 pb-4 pt-1">
-            <button
-                x-ref="cardCartBtn"
-                @click.prevent="adding = true; flyToCart($refs.cardCartBtn, '{{ $product->featured_image ? asset('storage/' . $product->featured_image) : '' }}'); fetch('{{ route('cart.add') }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
-                    body: JSON.stringify({ product_id: {{ $product->id }}, quantity: 1 })
-                }).then(r => r.json()).then(d => {
-                    adding = false; added = true;
-                    showCartToast('{{ addslashes($product->title) }}', '{{ $product->featured_image ? asset('storage/' . $product->featured_image) : asset('images/karungulai.jpg') }}', 1, d.cartCount);
-                    setTimeout(() => added = false, 2000);
-                }).catch(() => adding = false)"
-                :disabled="adding"
-                class="w-full py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-1.5"
-                :class="added ? 'bg-green-500 text-white' : 'bg-royal-blue text-white hover:bg-deep-royal'"
-            >
-                <template x-if="!adding && !added">
-                    <span class="flex items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path></svg>
-                        Add to Cart
-                    </span>
-                </template>
-                <template x-if="adding">
-                    <span class="flex items-center gap-1.5">
-                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                        Adding...
-                    </span>
-                </template>
-                <template x-if="added">
-                    <span class="flex items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                        Added!
-                    </span>
-                </template>
-            </button>
+            @if($cardStock <= 0)
+                <button disabled class="w-full py-2.5 rounded-lg text-xs sm:text-sm font-semibold bg-gray-300 text-gray-500 cursor-not-allowed flex items-center justify-center gap-1.5">
+                    Out of Stock
+                </button>
+            @else
+                <button
+                    x-ref="cardCartBtn"
+                    @click.prevent="adding = true; flyToCart($refs.cardCartBtn, '{{ $product->featured_image ? asset('storage/' . $product->featured_image) : '' }}'); fetch('{{ route('cart.add') }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
+                        body: JSON.stringify({ product_id: {{ $product->id }}, quantity: 1 })
+                    }).then(r => r.json()).then(d => {
+                        if (!d.success) { alert(d.message); adding = false; return; }
+                        adding = false; added = true;
+                        showCartToast('{{ addslashes($product->title) }}', '{{ $product->featured_image ? asset('storage/' . $product->featured_image) : asset('images/karungulai.jpg') }}', 1, d.cartCount);
+                        setTimeout(() => added = false, 2000);
+                    }).catch(() => adding = false)"
+                    :disabled="adding"
+                    class="w-full py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-1.5"
+                    :class="added ? 'bg-green-500 text-white' : 'bg-royal-blue text-white hover:bg-deep-royal'"
+                >
+                    <template x-if="!adding && !added">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                            Add to Cart
+                        </span>
+                    </template>
+                    <template x-if="adding">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            Adding...
+                        </span>
+                    </template>
+                    <template x-if="added">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            Added!
+                        </span>
+                    </template>
+                </button>
+            @endif
         </div>
     </div>
 </div>

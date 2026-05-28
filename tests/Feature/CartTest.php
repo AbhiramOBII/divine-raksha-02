@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductStock;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -19,7 +20,7 @@ class CartTest extends TestCase
             'status' => true,
         ]);
 
-        return Product::create([
+        $product = Product::create([
             'title' => 'Test Product',
             'slug' => 'test-product',
             'sku' => 'CRT-001',
@@ -27,6 +28,13 @@ class CartTest extends TestCase
             'selling_price' => 999,
             'status' => true,
         ]);
+
+        ProductStock::create([
+            'product_id' => $product->id,
+            'quantity' => 10,
+        ]);
+
+        return $product;
     }
 
     public function test_cart_page_loads(): void

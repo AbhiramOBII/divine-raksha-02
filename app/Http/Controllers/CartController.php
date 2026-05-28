@@ -14,13 +14,14 @@ class CartController extends Controller
         $total = 0;
 
         foreach ($cart as $id => $item) {
-            $product = Product::find($id);
+            $product = Product::with('stocks')->find($id);
             if ($product) {
                 $cartItems[] = [
                     'product' => $product,
                     'quantity' => $item['quantity'],
                     'size' => $item['size'] ?? null,
                     'subtotal' => $product->selling_price * $item['quantity'],
+                    'stock' => $product->stocks->sum('quantity'),
                 ];
                 $total += $product->selling_price * $item['quantity'];
             }
@@ -37,9 +38,25 @@ class CartController extends Controller
             'size' => 'nullable|string',
         ]);
 
-        $product = Product::findOrFail($request->product_id);
+        $product = Product::with('stocks')->findOrFail($request->product_id);
+        $totalStock = $product->stocks->sum('quantity');
         $cart = session()->get('cart', []);
         $id = $product->id;
+
+        $currentQty = $cart[$id]['quantity'] ?? 0;
+        $requestedQty = $currentQty + $request->quantity;
+
+        if ($totalStock <= 0) {
+            return $this->stockError($request, 'This product is currently out of stock.');
+        }
+
+        if ($requestedQty > $totalStock) {
+            $canAdd = $totalStock - $currentQty;
+            if ($canAdd <= 0) {
+                return $this->stockError($request, "You already have the maximum available quantity ({$totalStock}) in your cart.");
+            }
+            return $this->stockError($request, "Only {$totalStock} available in stock. You can add {$canAdd} more.");
+        }
 
         if (isset($cart[$id])) {
             $cart[$id]['quantity'] += $request->quantity;
@@ -76,6 +93,13 @@ class CartController extends Controller
         if ($request->quantity <= 0) {
             unset($cart[$id]);
         } else {
+            $product = Product::with('stocks')->findOrFail($id);
+            $totalStock = $product->stocks->sum('quantity');
+
+            if ($request->quantity > $totalStock) {
+                return $this->stockError($request, "Only {$totalStock} available in stock.");
+            }
+
             if (isset($cart[$id])) {
                 $cart[$id]['quantity'] = $request->quantity;
             }
@@ -125,5 +149,13 @@ class CartController extends Controller
         return response()->json([
             'count' => array_sum(array_column($cart, 'quantity')),
         ]);
+    }
+
+    private function stockError(Request $request, string $message)
+    {
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => false, 'message' => $message], 422);
+        }
+        return back()->with('error', $message);
     }
 }

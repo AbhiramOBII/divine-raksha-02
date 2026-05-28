@@ -158,14 +158,14 @@
                     @endif
 
                     <!-- Quantity and Add to Cart -->
-                    <div class="space-y-4" x-data="{ qty: 1, adding: false, added: false }">
+                    <div class="space-y-4" x-data="{ qty: 1, adding: false, added: false, error: '' }">
                         <div>
                             <h3 class="text-lg font-semibold text-royal-blue mb-3">Quantity</h3>
                             <div class="flex items-center space-x-4">
                                 <div class="flex items-center border border-gray-300 rounded-lg">
-                                    <button @click="qty = Math.max(1, qty - 1)" class="px-3 py-2 text-gray-600 hover:text-royal-blue">-</button>
+                                    <button @click="qty = Math.max(1, qty - 1)" class="px-3 py-2 text-gray-600 hover:text-royal-blue" {{ $totalStock <= 0 ? 'disabled' : '' }}>-</button>
                                     <span class="px-4 py-2 border-l border-r border-gray-300" x-text="qty"></span>
-                                    <button @click="qty = Math.min(99, qty + 1)" class="px-3 py-2 text-gray-600 hover:text-royal-blue">+</button>
+                                    <button @click="qty = Math.min({{ $totalStock > 0 ? $totalStock : 1 }}, qty + 1)" class="px-3 py-2 text-gray-600 hover:text-royal-blue" {{ $totalStock <= 0 ? 'disabled' : '' }}>+</button>
                                 </div>
                                 @if($totalStock > 0 && $totalStock <= 10)
                                     <span class="text-sm text-gray-600">Only {{ $totalStock }} left in stock</span>
@@ -175,14 +175,17 @@
                             </div>
                         </div>
 
+                        <p x-show="error" x-cloak class="text-sm text-divine-red" x-text="error"></p>
+
                         <div class="flex space-x-4">
                             <button
                                 x-ref="addBtn"
-                                @click="adding = true; flyToCart($refs.addBtn, '{{ $product->featured_image ? asset('storage/' . $product->featured_image) : '' }}'); fetch('{{ route('cart.add') }}', {
+                                @click="error = ''; adding = true; flyToCart($refs.addBtn, '{{ $product->featured_image ? asset('storage/' . $product->featured_image) : '' }}'); fetch('{{ route('cart.add') }}', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                                     body: JSON.stringify({ product_id: {{ $product->id }}, quantity: qty })
                                 }).then(r => r.json()).then(d => {
+                                    if (!d.success) { error = d.message; adding = false; return; }
                                     adding = false; added = true;
                                     showCartToast('{{ addslashes($product->title) }}', '{{ $product->featured_image ? asset('storage/' . $product->featured_image) : asset('images/karungulai.jpg') }}', qty, d.cartCount);
                                     setTimeout(() => added = false, 3000);

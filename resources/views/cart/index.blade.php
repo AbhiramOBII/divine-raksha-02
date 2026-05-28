@@ -39,10 +39,19 @@
                                     </div>
 
                                     <!-- Quantity -->
-                                    <div class="flex items-center border border-gray-200 rounded-lg" x-data="{ qty: {{ $item['quantity'] }} }">
-                                        <button @click="qty = Math.max(1, qty - 1); updateCart({{ $item['product']->id }}, qty)" class="px-2 sm:px-3 py-1.5 text-gray-500 hover:text-royal-blue text-sm">-</button>
-                                        <span class="px-2 sm:px-3 py-1.5 border-l border-r border-gray-200 text-sm font-medium min-w-[32px] text-center" x-text="qty"></span>
-                                        <button @click="qty = Math.min(99, qty + 1); updateCart({{ $item['product']->id }}, qty)" class="px-2 sm:px-3 py-1.5 text-gray-500 hover:text-royal-blue text-sm">+</button>
+                                    <div class="flex flex-col items-center gap-1" x-data="{ qty: {{ $item['quantity'] }} }">
+                                        <div class="flex items-center border border-gray-200 rounded-lg">
+                                            <button @click="qty = Math.max(1, qty - 1); updateCart({{ $item['product']->id }}, qty)" class="px-2 sm:px-3 py-1.5 text-gray-500 hover:text-royal-blue text-sm">-</button>
+                                            <span class="px-2 sm:px-3 py-1.5 border-l border-r border-gray-200 text-sm font-medium min-w-[32px] text-center" x-text="qty"></span>
+                                            <button @click="qty = Math.min({{ $item['stock'] }}, qty + 1); updateCart({{ $item['product']->id }}, qty)" class="px-2 sm:px-3 py-1.5 text-gray-500 hover:text-royal-blue text-sm" {{ $item['quantity'] >= $item['stock'] ? 'disabled' : '' }}>+</button>
+                                        </div>
+                                        @if($item['stock'] <= 0)
+                                            <span class="text-[10px] text-divine-red font-medium">Out of Stock</span>
+                                        @elseif($item['quantity'] >= $item['stock'])
+                                            <span class="text-[10px] text-divine-red font-medium">Max available: {{ $item['stock'] }}</span>
+                                        @elseif($item['stock'] <= 5)
+                                            <span class="text-[10px] text-gray-500">Only {{ $item['stock'] }} left</span>
+                                        @endif
                                     </div>
 
                                     <!-- Subtotal -->
@@ -131,7 +140,12 @@
                 },
                 body: JSON.stringify({ product_id: productId, quantity: quantity })
             }).then(r => r.json()).then(data => {
-                if (data.success) location.reload();
+                if (data.success) {
+                    location.reload();
+                } else if (data.message) {
+                    alert(data.message);
+                    location.reload();
+                }
             });
         }
 

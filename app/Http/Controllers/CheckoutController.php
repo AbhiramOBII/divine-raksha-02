@@ -61,13 +61,26 @@ class CheckoutController extends Controller
             'payment_method' => 'required|in:cod,online',
         ]);
 
-        // Calculate totals
+        // Calculate totals and validate stock
         $subtotal = 0;
         $items = [];
+        $stockErrors = [];
 
         foreach ($cart as $id => $cartItem) {
-            $product = Product::find($id);
+            $product = Product::with('stocks')->find($id);
             if ($product) {
+                $totalStock = $product->stocks->sum('quantity');
+
+                if ($totalStock <= 0) {
+                    $stockErrors[] = "'{$product->title}' is out of stock.";
+                    continue;
+                }
+
+                if ($cartItem['quantity'] > $totalStock) {
+                    $stockErrors[] = "'{$product->title}' only has {$totalStock} in stock (you requested {$cartItem['quantity']}).";
+                    continue;
+                }
+
                 $itemSubtotal = $product->selling_price * $cartItem['quantity'];
                 $subtotal += $itemSubtotal;
                 $items[] = [
@@ -77,6 +90,14 @@ class CheckoutController extends Controller
                     'subtotal' => $itemSubtotal,
                 ];
             }
+        }
+
+        if (!empty($stockErrors)) {
+            $errorMsg = implode(' ', $stockErrors);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->withErrors(['stock' => $errorMsg]);
         }
 
         $shipping = $subtotal >= 999 ? 0 : 99;
