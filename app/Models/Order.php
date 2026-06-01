@@ -31,6 +31,8 @@ class Order extends Model
         'subtotal',
         'shipping_charge',
         'discount',
+        'coupon_code',
+        'coupon_discount',
         'total',
         'payment_method',
         'transaction_id',
@@ -46,6 +48,7 @@ class Order extends Model
             'subtotal' => 'decimal:2',
             'shipping_charge' => 'decimal:2',
             'discount' => 'decimal:2',
+            'coupon_discount' => 'decimal:2',
             'total' => 'decimal:2',
         ];
     }

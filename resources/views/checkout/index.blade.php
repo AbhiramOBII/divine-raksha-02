@@ -132,6 +132,25 @@
                             @endforeach
                         </div>
 
+                        <!-- Coupon Code -->
+                        <div class="border-t border-gray-200 pt-4 mb-4" x-data="couponHandler()">
+                            <div x-show="!applied" class="flex gap-2">
+                                <input type="text" x-model="code" placeholder="Coupon code" class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue uppercase" @keydown.enter.prevent="applyCoupon()">
+                                <button type="button" @click="applyCoupon()" :disabled="loading || !code" class="px-4 py-2 bg-royal-blue text-white text-sm rounded-lg hover:bg-deep-royal transition-colors disabled:opacity-50 whitespace-nowrap">
+                                    <span x-show="!loading">Apply</span>
+                                    <span x-show="loading">...</span>
+                                </button>
+                            </div>
+                            <div x-show="applied" x-cloak class="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                                <div>
+                                    <span class="text-xs font-semibold text-green-700" x-text="appliedCode"></span>
+                                    <span class="text-xs text-green-600 ml-1">- ₹<span x-text="discountAmount"></span></span>
+                                </div>
+                                <button type="button" @click="removeCoupon()" class="text-red-500 hover:text-red-700 text-xs font-medium">Remove</button>
+                            </div>
+                            <p x-show="message" x-cloak class="text-xs mt-1.5" :class="applied ? 'text-green-600' : 'text-red-500'" x-text="message"></p>
+                        </div>
+
                         <div class="border-t border-gray-200 pt-4 space-y-3 text-sm">
                             <div class="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
@@ -141,9 +160,13 @@
                                 <span>Shipping</span>
                                 <span class="font-medium {{ $shipping == 0 ? 'text-green-600' : 'text-gray-900' }}">{{ $shipping == 0 ? 'FREE' : '₹' . number_format($shipping) }}</span>
                             </div>
+                            <div x-data="{ couponDisc: {{ $couponDiscount }} }" x-show="couponDisc > 0" x-cloak class="flex justify-between text-green-600">
+                                <span>Coupon Discount</span>
+                                <span class="font-medium" id="coupon-discount-row">-₹<span id="coupon-discount-val">{{ number_format($couponDiscount) }}</span></span>
+                            </div>
                             <div class="border-t border-gray-200 pt-3 flex justify-between">
                                 <span class="font-semibold text-gray-900">Total</span>
-                                <span class="font-bold text-xl text-royal-blue">₹{{ number_format($total) }}</span>
+                                <span class="font-bold text-xl text-royal-blue" id="order-total">₹{{ number_format($total) }}</span>
                             </div>
                         </div>
 
@@ -169,6 +192,71 @@
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
+        function couponHandler() {
+            return {
+                code: '',
+                loading: false,
+                applied: {{ $coupon ? 'true' : 'false' }},
+                appliedCode: '{{ $coupon["code"] ?? "" }}',
+                discountAmount: '{{ number_format($couponDiscount) }}',
+                message: '',
+
+                async applyCoupon() {
+                    if (!this.code.trim()) return;
+                    this.loading = true;
+                    this.message = '';
+
+                    try {
+                        const res = await fetch('{{ route("coupon.apply") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({ code: this.code }),
+                        });
+                        const data = await res.json();
+
+                        if (data.success) {
+                            this.applied = true;
+                            this.appliedCode = data.coupon_code;
+                            this.discountAmount = new Intl.NumberFormat('en-IN').format(data.discount);
+                            this.message = data.message;
+                            // Reload to recalculate totals
+                            window.location.reload();
+                        } else {
+                            this.message = data.message;
+                        }
+                    } catch (e) {
+                        this.message = 'Failed to apply coupon.';
+                    }
+                    this.loading = false;
+                },
+
+                async removeCoupon() {
+                    try {
+                        await fetch('{{ route("coupon.remove") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                        });
+                        this.applied = false;
+                        this.appliedCode = '';
+                        this.discountAmount = '0';
+                        this.code = '';
+                        this.message = '';
+                        window.location.reload();
+                    } catch (e) {
+                        this.message = 'Failed to remove coupon.';
+                    }
+                }
+            }
+        }
+
         function checkoutForm() {
             return {
                 processing: false,

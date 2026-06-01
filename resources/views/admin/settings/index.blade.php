@@ -46,6 +46,35 @@
             </div>
         </div>
 
+        <!-- Offer Marquee -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-1">Offer Marquee</h2>
+            <p class="text-sm text-gray-500 mb-6">Scrolling announcement banner displayed between header and hero on the homepage</p>
+
+            <div class="space-y-4">
+                <div class="flex items-center gap-3">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="marquee_enabled" value="">
+                        <input type="checkbox" name="marquee_enabled" value="1" class="sr-only peer"
+                               {{ old('marquee_enabled', $settings['marquee_enabled'] ?? '') == '1' ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-royal-blue rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-royal-blue"></div>
+                    </label>
+                    <span class="text-sm font-medium text-gray-700">Enable Marquee</span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Marquee Text</label>
+                    <textarea name="marquee_text" rows="3"
+                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue"
+                              placeholder="e.g. Free Shipping on Orders Above ₹999 | Use Code DIVINE10 for 10% Off | New Arrivals Every Week">{{ old('marquee_text', $settings['marquee_text'] ?? '') }}</textarea>
+                    <p class="text-xs text-gray-400 mt-1">Use <code class="bg-gray-100 px-1 rounded">|</code> (pipe) to separate multiple messages. They will scroll continuously.</p>
+                    @error('marquee_text')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
         <!-- Contact Information -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-1">Contact Information</h2>
@@ -176,8 +205,56 @@
                 </div>
             </div>
 
-            <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <div class="mt-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Webhook Secret</label>
+                <div class="relative" x-data="{ show: false }">
+                    <input :type="show ? 'text' : 'password'" name="razorpay_webhook_secret" value="{{ old('razorpay_webhook_secret', $settings['razorpay_webhook_secret'] ?? '') }}"
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue font-mono pr-10"
+                           placeholder="Enter your webhook secret">
+                    <button type="button" @click="show = !show" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <svg x-show="!show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <svg x-show="show" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                    </button>
+                </div>
+                @error('razorpay_webhook_secret')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg space-y-2">
                 <p class="text-xs text-amber-700"><strong>Note:</strong> Use <code class="bg-amber-100 px-1 rounded">rzp_test_</code> keys for testing and <code class="bg-amber-100 px-1 rounded">rzp_live_</code> keys for production. Get your keys from <a href="https://dashboard.razorpay.com/app/keys" target="_blank" class="underline font-medium">Razorpay Dashboard</a>.</p>
+                <p class="text-xs text-amber-700"><strong>Webhook URL:</strong> Set your webhook endpoint in Razorpay Dashboard to: <code class="bg-amber-100 px-1 rounded break-all">{{ url('/webhook/razorpay') }}</code></p>
+                <p class="text-xs text-amber-700"><strong>Events to enable:</strong> <code class="bg-amber-100 px-1 rounded">payment.failed</code>, <code class="bg-amber-100 px-1 rounded">order.paid</code>, <code class="bg-amber-100 px-1 rounded">refund.processed</code>, <code class="bg-amber-100 px-1 rounded">refund.failed</code></p>
+            </div>
+        </div>
+
+        <!-- Shipping Settings -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-1">Shipping</h2>
+            <p class="text-sm text-gray-500 mb-6">Configure shipping cost and free shipping threshold</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Free Shipping Threshold (₹)</label>
+                    <input type="number" name="shipping_free_threshold" value="{{ old('shipping_free_threshold', $settings['shipping_free_threshold'] ?? '999') }}" step="1" min="0"
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue"
+                           placeholder="e.g. 999">
+                    <p class="text-xs text-gray-400 mt-1">Minimum order value to qualify for free shipping. Set to 0 to always offer free shipping.</p>
+                    @error('shipping_free_threshold')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Shipping Cost (₹)</label>
+                    <input type="number" name="shipping_cost" value="{{ old('shipping_cost', $settings['shipping_cost'] ?? '99') }}" step="1" min="0"
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue"
+                           placeholder="e.g. 99">
+                    <p class="text-xs text-gray-400 mt-1">Flat shipping charge when order is below the free shipping threshold.</p>
+                    @error('shipping_cost')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
         </div>
 

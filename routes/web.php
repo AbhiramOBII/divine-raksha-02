@@ -22,6 +22,10 @@ Route::post('/cart/update', [CartController::class, 'update'])->name('cart.updat
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
 
+// Coupon
+Route::post('/coupon/apply', [App\Http\Controllers\CouponController::class, 'apply'])->name('coupon.apply');
+Route::post('/coupon/remove', [App\Http\Controllers\CouponController::class, 'remove'])->name('coupon.remove');
+
 // Checkout
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
@@ -31,6 +35,10 @@ Route::get('/checkout/success/{orderNumber}', [CheckoutController::class, 'succe
 Route::post('/payment/create-order', [App\Http\Controllers\PaymentController::class, 'createOrder'])->name('payment.createOrder');
 Route::post('/payment/verify', [App\Http\Controllers\PaymentController::class, 'verify'])->name('payment.verify');
 Route::get('/payment/failed/{orderNumber}', [App\Http\Controllers\PaymentController::class, 'failed'])->name('payment.failed');
+
+// Razorpay Webhook (CSRF excluded in bootstrap/app.php)
+Route::post('/webhook/razorpay', [App\Http\Controllers\RazorpayWebhookController::class, 'handle'])->name('webhook.razorpay');
+Route::get('/webhook/razorpay', fn () => response()->json(['status' => 'Webhook endpoint active. POST only.']));
 
 // Sitemap
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');

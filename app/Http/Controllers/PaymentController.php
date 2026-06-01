@@ -92,8 +92,8 @@ class PaymentController extends Controller
                 'payment_status' => 'paid',
             ]);
 
-            // Clear cart
-            session()->forget('cart');
+            // Clear cart and coupon
+            session()->forget(['cart', 'coupon']);
 
             return response()->json([
                 'success' => true,

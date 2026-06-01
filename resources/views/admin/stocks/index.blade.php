@@ -83,8 +83,8 @@
                             <th class="text-left px-6 py-3 font-medium text-gray-600">Product</th>
                             <th class="text-left px-6 py-3 font-medium text-gray-600">SKU</th>
                             <th class="text-left px-6 py-3 font-medium text-gray-600">Category</th>
-                            <th class="text-left px-6 py-3 font-medium text-gray-600">Sizes</th>
-                            <th class="text-left px-6 py-3 font-medium text-gray-600">Total Stock</th>
+                            <th class="text-left px-6 py-3 font-medium text-gray-600">Current Stock</th>
+                            <th class="text-left px-6 py-3 font-medium text-gray-600">Total</th>
                             <th class="text-left px-6 py-3 font-medium text-gray-600">Status</th>
                             <th class="text-right px-6 py-3 font-medium text-gray-600">Action</th>
                         </tr>
@@ -106,21 +106,31 @@
                                 </td>
                                 <td class="px-6 py-4 text-gray-600">{{ $product->category->title ?? '—' }}</td>
                                 <td class="px-6 py-4">
-                                    @if($product->size && count($product->size) > 0)
-                                        <div class="flex flex-wrap gap-1">
-                                            @foreach($product->size as $size)
-                                                <span class="px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-600">{{ $size }}</span>
+                                    @if($noStock)
+                                        <span class="text-gray-400 text-xs">Not set</span>
+                                    @elseif($product->stocks->count() === 1 && !$product->stocks->first()->size)
+                                        <span class="font-semibold {{ $product->stocks->first()->isOutOfStock() ? 'text-divine-red' : ($product->stocks->first()->isLowStock() ? 'text-yellow-600' : 'text-gray-900') }}">
+                                            {{ number_format($product->stocks->first()->quantity) }} units
+                                        </span>
+                                    @else
+                                        <div class="flex flex-wrap gap-1.5">
+                                            @foreach($product->stocks as $stock)
+                                                @php
+                                                    $bgClass = $stock->isOutOfStock() ? 'bg-red-50 text-red-700 border-red-200' : ($stock->isLowStock() ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-green-50 text-green-700 border-green-200');
+                                                @endphp
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border {{ $bgClass }}">
+                                                    @if($stock->size)<span class="text-gray-500">{{ $stock->size }}:</span>@endif
+                                                    {{ $stock->quantity }}
+                                                </span>
                                             @endforeach
                                         </div>
-                                    @else
-                                        <span class="text-gray-400 text-xs">No sizes</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     @if($noStock)
-                                        <span class="text-gray-400">Not set</span>
+                                        <span class="text-gray-400">—</span>
                                     @else
-                                        <span class="font-semibold {{ $hasOut ? 'text-divine-red' : ($hasLow ? 'text-yellow-600' : 'text-gray-900') }}">
+                                        <span class="font-bold text-lg {{ $hasOut ? 'text-divine-red' : ($hasLow ? 'text-yellow-600' : 'text-gray-900') }}">
                                             {{ number_format($totalStock) }}
                                         </span>
                                     @endif

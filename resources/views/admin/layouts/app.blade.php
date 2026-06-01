@@ -113,6 +113,9 @@
                 <a href="{{ route('admin.stocks.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 {{ request()->routeIs('admin.stocks.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
                     Stock
                 </a>
+                <a href="{{ route('admin.coupons.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 {{ request()->routeIs('admin.coupons.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
+                    Coupons
+                </a>
                 <span class="text-white/20 px-1">|</span>
                 <a href="{{ route('admin.sliders.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 {{ request()->routeIs('admin.sliders.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
                     Sliders
@@ -144,6 +147,7 @@
                     <a href="{{ route('admin.categories.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.categories.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Categories</a>
                     <a href="{{ route('admin.orders.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.orders.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Orders</a>
                     <a href="{{ route('admin.stocks.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.stocks.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Stock</a>
+                    <a href="{{ route('admin.coupons.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.coupons.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Coupons</a>
                     <a href="{{ route('admin.sliders.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.sliders.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Sliders</a>
                     <a href="{{ route('admin.blog-categories.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.blog-categories.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Blog Cat.</a>
                     <a href="{{ route('admin.blogs.index') }}" class="px-3 py-2 rounded-lg text-xs font-medium text-center transition-all duration-200 {{ request()->routeIs('admin.blogs.*') ? 'bg-white/15 text-sacred-gold' : 'text-white/70 hover:bg-white/10' }}">Blogs</a>

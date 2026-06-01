@@ -83,18 +83,23 @@
                                     <span>Subtotal ({{ count($cartItems) }} items)</span>
                                     <span class="font-medium text-gray-900">₹{{ number_format($total) }}</span>
                                 </div>
+                                @php
+                                    $freeThreshold = (float) setting('shipping_free_threshold', 999);
+                                    $shippingCost = (float) setting('shipping_cost', 99);
+                                    $isFreeShipping = $total >= $freeThreshold;
+                                @endphp
                                 <div class="flex justify-between text-gray-600">
                                     <span>Shipping</span>
-                                    <span class="font-medium {{ $total >= 999 ? 'text-green-600' : 'text-gray-900' }}">{{ $total >= 999 ? 'FREE' : '₹99' }}</span>
+                                    <span class="font-medium {{ $isFreeShipping ? 'text-green-600' : 'text-gray-900' }}">{{ $isFreeShipping ? 'FREE' : '₹' . number_format($shippingCost) }}</span>
                                 </div>
                                 <div class="border-t border-gray-200 pt-3 flex justify-between">
                                     <span class="font-semibold text-gray-900">Total</span>
-                                    <span class="font-bold text-xl text-royal-blue">₹{{ number_format($total >= 999 ? $total : $total + 99) }}</span>
+                                    <span class="font-bold text-xl text-royal-blue">₹{{ number_format($isFreeShipping ? $total : $total + $shippingCost) }}</span>
                                 </div>
                             </div>
 
-                            @if($total < 999)
-                                <p class="text-xs text-gray-500 mt-3 bg-yellow-50 p-2 rounded-lg">Add ₹{{ number_format(999 - $total) }} more for free shipping!</p>
+                            @if(!$isFreeShipping)
+                                <p class="text-xs text-gray-500 mt-3 bg-yellow-50 p-2 rounded-lg">Add ₹{{ number_format($freeThreshold - $total) }} more for free shipping!</p>
                             @endif
 
                             <a href="{{ route('checkout.index') }}" class="mt-6 block w-full bg-royal-blue text-white text-center py-4 rounded-full font-semibold hover:bg-deep-royal transition-colors sacred-glow">

@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\StockController;
+use App\Http\Controllers\Admin\CouponController;
 use Illuminate\Support\Facades\Route;
 
 // Admin Guest Routes (redirect to dashboard if already logged in)
@@ -51,6 +52,7 @@ Route::middleware('admin.auth')->group(function () {
     Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
     Route::patch('orders/{order}/payment-status', [OrderController::class, 'updatePaymentStatus'])->name('admin.orders.updatePaymentStatus');
     Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
+    Route::get('orders-export/csv', [OrderController::class, 'exportCsv'])->name('admin.orders.exportCsv');
 
     // Blog Categories
     Route::resource('blog-categories', BlogCategoryController::class)->except(['show'])->names('admin.blog-categories');
@@ -70,6 +72,9 @@ Route::middleware('admin.auth')->group(function () {
     Route::put('media/{medium}', [MediaController::class, 'update'])->name('admin.media.update');
     Route::delete('media/{medium}', [MediaController::class, 'destroy'])->name('admin.media.destroy');
     Route::post('media/bulk-delete', [MediaController::class, 'bulkDelete'])->name('admin.media.bulkDelete');
+
+    // Coupons
+    Route::resource('coupons', CouponController::class)->except(['show'])->names('admin.coupons');
 
     // Site Settings
     Route::get('settings', [SiteSettingController::class, 'index'])->name('admin.settings.index');

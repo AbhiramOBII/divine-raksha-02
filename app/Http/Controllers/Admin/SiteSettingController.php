@@ -20,6 +20,11 @@ class SiteSettingController extends Controller
         'social_youtube',
         'razorpay_key_id',
         'razorpay_key_secret',
+        'razorpay_webhook_secret',
+        'marquee_enabled',
+        'marquee_text',
+        'shipping_free_threshold',
+        'shipping_cost',
     ];
 
     public function index()
@@ -42,6 +47,11 @@ class SiteSettingController extends Controller
             'social_youtube' => 'nullable|url|max:255',
             'razorpay_key_id' => 'nullable|string|max:255',
             'razorpay_key_secret' => 'nullable|string|max:255',
+            'razorpay_webhook_secret' => 'nullable|string|max:255',
+            'marquee_enabled' => 'nullable|string|in:1',
+            'marquee_text' => 'nullable|string|max:1000',
+            'shipping_free_threshold' => 'nullable|numeric|min:0',
+            'shipping_cost' => 'nullable|numeric|min:0',
         ]);
 
         foreach ($this->settingKeys as $key) {

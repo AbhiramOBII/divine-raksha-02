@@ -83,6 +83,7 @@
                         <th class="text-left px-6 py-3 font-medium text-gray-600">Customer</th>
                         <th class="text-left px-6 py-3 font-medium text-gray-600">Total</th>
                         <th class="text-left px-6 py-3 font-medium text-gray-600">Status</th>
+                        <th class="text-left px-6 py-3 font-medium text-gray-600">Payment</th>
                         <th class="text-left px-6 py-3 font-medium text-gray-600">Date</th>
                     </tr>
                 </thead>
@@ -100,7 +101,66 @@
                                 @endphp
                                 <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium {{ $sc[$order->status] ?? '' }}">{{ ucfirst($order->status) }}</span>
                             </td>
+                            <td class="px-6 py-3">
+                                @php
+                                    $pc = ['paid'=>'bg-green-50 text-green-700','pending'=>'bg-yellow-50 text-yellow-700','failed'=>'bg-red-50 text-red-700','refunded'=>'bg-gray-100 text-gray-700'];
+                                @endphp
+                                <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium {{ $pc[$order->payment_status] ?? 'bg-gray-100 text-gray-600' }}">{{ ucfirst($order->payment_status) }}</span>
+                            </td>
                             <td class="px-6 py-3 text-gray-500">{{ $order->created_at->format('d M Y') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+    <!-- Low Stock Products -->
+    @if($lowStockProducts->count() > 0)
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>
+                <h3 class="font-semibold text-gray-900">Low Stock / Out of Stock Products</h3>
+            </div>
+            <a href="{{ route('admin.stocks.index', ['filter' => 'low']) }}" class="text-sm text-royal-blue hover:text-deep-royal font-medium">View All &rarr;</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="text-left px-6 py-3 font-medium text-gray-600">Product</th>
+                        <th class="text-left px-6 py-3 font-medium text-gray-600">SKU</th>
+                        <th class="text-left px-6 py-3 font-medium text-gray-600">Category</th>
+                        <th class="text-left px-6 py-3 font-medium text-gray-600">Stock</th>
+                        <th class="text-left px-6 py-3 font-medium text-gray-600">Status</th>
+                        <th class="text-right px-6 py-3 font-medium text-gray-600">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach($lowStockProducts as $product)
+                        @php
+                            $totalStock = $product->stocks->sum('quantity');
+                            $hasOut = $product->stocks->contains(fn($s) => $s->isOutOfStock());
+                        @endphp
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-3 font-medium text-gray-900">{{ $product->title }}</td>
+                            <td class="px-6 py-3"><code class="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">{{ $product->sku }}</code></td>
+                            <td class="px-6 py-3 text-gray-600">{{ $product->category->title ?? '—' }}</td>
+                            <td class="px-6 py-3">
+                                <span class="font-bold {{ $hasOut ? 'text-divine-red' : 'text-yellow-600' }}">{{ $totalStock }}</span>
+                            </td>
+                            <td class="px-6 py-3">
+                                @if($hasOut)
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">Out of Stock</span>
+                                @else
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700">Low Stock</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-3 text-right">
+                                <a href="{{ route('admin.stocks.manage', $product) }}" class="text-sm text-royal-blue hover:text-deep-royal font-medium">Manage</a>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

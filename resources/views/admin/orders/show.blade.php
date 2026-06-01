@@ -94,7 +94,12 @@
                     </div>
                     @if($order->discount > 0)
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Discount</span>
+                            <span class="text-gray-500">
+                                Discount
+                                @if($order->coupon_code)
+                                    <code class="ml-1 px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded">{{ $order->coupon_code }}</code>
+                                @endif
+                            </span>
                             <span class="text-green-600">-₹{{ number_format($order->discount, 2) }}</span>
                         </div>
                     @endif

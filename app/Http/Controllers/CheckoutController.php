@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,12 +35,35 @@ class CheckoutController extends Controller
             }
         }
 
-        $shipping = $subtotal >= 999 ? 0 : 99;
-        $total = $subtotal + $shipping;
+        $freeThreshold = (float) setting('shipping_free_threshold', 999);
+        $shippingCost = (float) setting('shipping_cost', 99);
+        $shipping = $subtotal >= $freeThreshold ? 0 : $shippingCost;
+
+        // Coupon discount
+        $coupon = session()->get('coupon');
+        $couponDiscount = 0;
+        if ($coupon) {
+            $couponModel = \App\Models\Coupon::find($coupon['id']);
+            if ($couponModel) {
+                $validation = $couponModel->isValid($subtotal, Auth::id());
+                if ($validation['valid']) {
+                    $couponDiscount = $couponModel->calculateDiscount($subtotal);
+                    session()->put('coupon.discount', $couponDiscount);
+                } else {
+                    session()->forget('coupon');
+                    $coupon = null;
+                }
+            } else {
+                session()->forget('coupon');
+                $coupon = null;
+            }
+        }
+
+        $total = $subtotal + $shipping - $couponDiscount;
 
         $user = Auth::user();
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'user'));
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'user', 'coupon', 'couponDiscount'));
     }
 
     public function placeOrder(Request $request)
@@ -100,8 +124,30 @@ class CheckoutController extends Controller
             return back()->withErrors(['stock' => $errorMsg]);
         }
 
-        $shipping = $subtotal >= 999 ? 0 : 99;
-        $total = $subtotal + $shipping;
+        $freeThreshold = (float) setting('shipping_free_threshold', 999);
+        $shippingCost = (float) setting('shipping_cost', 99);
+        $shipping = $subtotal >= $freeThreshold ? 0 : $shippingCost;
+
+        // Handle coupon
+        $couponSession = session()->get('coupon');
+        $couponDiscount = 0;
+        $couponCode = null;
+        $couponModel = null;
+
+        if ($couponSession) {
+            $couponModel = \App\Models\Coupon::find($couponSession['id']);
+            if ($couponModel) {
+                $validation = $couponModel->isValid($subtotal, Auth::id(), $request->customer_email);
+                if ($validation['valid']) {
+                    $couponDiscount = $couponModel->calculateDiscount($subtotal);
+                    $couponCode = $couponModel->code;
+                } else {
+                    session()->forget('coupon');
+                }
+            }
+        }
+
+        $total = $subtotal + $shipping - $couponDiscount;
 
         // Create order
         $order = Order::create([
@@ -123,13 +169,27 @@ class CheckoutController extends Controller
             'billing_pincode' => $request->billing_pincode ?? $request->shipping_pincode,
             'subtotal' => $subtotal,
             'shipping_charge' => $shipping,
-            'discount' => 0,
+            'discount' => $couponDiscount,
+            'coupon_code' => $couponCode,
+            'coupon_discount' => $couponDiscount,
             'total' => $total,
             'payment_method' => $request->payment_method,
             'notes' => $request->notes,
         ]);
 
-        // Create order items
+        // Record coupon usage
+        if ($couponModel && $couponDiscount > 0) {
+            \App\Models\CouponUsage::create([
+                'coupon_id' => $couponModel->id,
+                'order_id' => $order->id,
+                'user_id' => Auth::id(),
+                'customer_email' => $request->customer_email,
+                'discount_amount' => $couponDiscount,
+            ]);
+            $couponModel->increment('times_used');
+        }
+
+        // Create order items and decrement stock
         foreach ($items as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
@@ -141,11 +201,25 @@ class CheckoutController extends Controller
                 'size' => $item['size'],
                 'subtotal' => $item['subtotal'],
             ]);
+
+            // Decrement stock
+            $remaining = $item['quantity'];
+            $stocks = ProductStock::where('product_id', $item['product']->id)
+                ->where('quantity', '>', 0)
+                ->orderBy('id')
+                ->get();
+
+            foreach ($stocks as $stock) {
+                if ($remaining <= 0) break;
+                $deduct = min($remaining, $stock->quantity);
+                $stock->decrement('quantity', $deduct);
+                $remaining -= $deduct;
+            }
         }
 
         // For COD, clear cart and redirect to success
         if ($request->payment_method === 'cod') {
-            session()->forget('cart');
+            session()->forget(['cart', 'coupon']);
 
             if ($request->expectsJson()) {
                 return response()->json([

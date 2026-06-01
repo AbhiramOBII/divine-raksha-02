@@ -37,45 +37,102 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
-        <form method="GET" action="{{ route('admin.orders.index') }}" class="flex flex-col sm:flex-row gap-4 flex-wrap">
-            <div class="flex-1 min-w-[200px]">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search order #, name, email, phone..."
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6" x-data="orderFilters()">
+        <form method="GET" action="{{ route('admin.orders.index') }}" class="space-y-4">
+            <div class="flex flex-col sm:flex-row gap-4 flex-wrap">
+                <div class="flex-1 min-w-[200px]">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search order #, name, email, phone..."
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+                </div>
+                <div>
+                    <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+                        <option value="">All Status</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="processing" {{ request('status') === 'processing' ? 'selected' : '' }}>Processing</option>
+                        <option value="shipped" {{ request('status') === 'shipped' ? 'selected' : '' }}>Shipped</option>
+                        <option value="delivered" {{ request('status') === 'delivered' ? 'selected' : '' }}>Delivered</option>
+                        <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                    </select>
+                </div>
+                <div>
+                    <select name="payment_status" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+                        <option value="">All Payment</option>
+                        <option value="pending" {{ request('payment_status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="paid" {{ request('payment_status') === 'paid' ? 'selected' : '' }}>Paid</option>
+                        <option value="failed" {{ request('payment_status') === 'failed' ? 'selected' : '' }}>Failed</option>
+                        <option value="refunded" {{ request('payment_status') === 'refunded' ? 'selected' : '' }}>Refunded</option>
+                    </select>
+                </div>
             </div>
-            <div>
-                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
-                    <option value="">All Status</option>
-                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="processing" {{ request('status') === 'processing' ? 'selected' : '' }}>Processing</option>
-                    <option value="shipped" {{ request('status') === 'shipped' ? 'selected' : '' }}>Shipped</option>
-                    <option value="delivered" {{ request('status') === 'delivered' ? 'selected' : '' }}>Delivered</option>
-                    <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                </select>
-            </div>
-            <div>
-                <select name="payment_status" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
-                    <option value="">All Payment</option>
-                    <option value="pending" {{ request('payment_status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="paid" {{ request('payment_status') === 'paid' ? 'selected' : '' }}>Paid</option>
-                    <option value="failed" {{ request('payment_status') === 'failed' ? 'selected' : '' }}>Failed</option>
-                    <option value="refunded" {{ request('payment_status') === 'refunded' ? 'selected' : '' }}>Refunded</option>
-                </select>
-            </div>
-            <div>
-                <input type="date" name="date_from" value="{{ request('date_from') }}" placeholder="From"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
-            </div>
-            <div>
-                <input type="date" name="date_to" value="{{ request('date_to') }}" placeholder="To"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
-            </div>
-            <div class="flex gap-2">
-                <button type="submit" class="px-4 py-2 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors">Filter</button>
-                <a href="{{ route('admin.orders.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors">Reset</a>
+
+            <div class="flex flex-col sm:flex-row gap-4 flex-wrap items-end">
+                <!-- Date Range Presets -->
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" @click="setRange('today')" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 hover:bg-royal-blue hover:text-white hover:border-royal-blue transition-colors">Today</button>
+                    <button type="button" @click="setRange('7days')" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 hover:bg-royal-blue hover:text-white hover:border-royal-blue transition-colors">Last 7 Days</button>
+                    <button type="button" @click="setRange('30days')" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 hover:bg-royal-blue hover:text-white hover:border-royal-blue transition-colors">Last 30 Days</button>
+                    <button type="button" @click="setRange('thisMonth')" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 hover:bg-royal-blue hover:text-white hover:border-royal-blue transition-colors">This Month</button>
+                    <button type="button" @click="setRange('lastMonth')" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 hover:bg-royal-blue hover:text-white hover:border-royal-blue transition-colors">Last Month</button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <input type="date" name="date_from" x-ref="dateFrom" value="{{ request('date_from') }}"
+                           class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+                    <span class="text-gray-400 text-sm">to</span>
+                    <input type="date" name="date_to" x-ref="dateTo" value="{{ request('date_to') }}"
+                           class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+                </div>
+
+                <div class="flex gap-2 ml-auto">
+                    <button type="submit" class="px-4 py-2 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors">Filter</button>
+                    <a href="{{ route('admin.orders.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors">Reset</a>
+                    <a href="{{ route('admin.orders.exportCsv', request()->query()) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Download CSV
+                    </a>
+                </div>
             </div>
         </form>
     </div>
+
+    <script>
+        function orderFilters() {
+            return {
+                setRange(preset) {
+                    const today = new Date();
+                    let from, to;
+
+                    switch(preset) {
+                        case 'today':
+                            from = to = this.formatDate(today);
+                            break;
+                        case '7days':
+                            to = this.formatDate(today);
+                            from = this.formatDate(new Date(today.getTime() - 7 * 86400000));
+                            break;
+                        case '30days':
+                            to = this.formatDate(today);
+                            from = this.formatDate(new Date(today.getTime() - 30 * 86400000));
+                            break;
+                        case 'thisMonth':
+                            from = this.formatDate(new Date(today.getFullYear(), today.getMonth(), 1));
+                            to = this.formatDate(today);
+                            break;
+                        case 'lastMonth':
+                            from = this.formatDate(new Date(today.getFullYear(), today.getMonth() - 1, 1));
+                            to = this.formatDate(new Date(today.getFullYear(), today.getMonth(), 0));
+                            break;
+                    }
+
+                    this.$refs.dateFrom.value = from;
+                    this.$refs.dateTo.value = to;
+                },
+                formatDate(d) {
+                    return d.toISOString().split('T')[0];
+                }
+            }
+        }
+    </script>
 
     <!-- Orders Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -90,6 +147,7 @@
                             <th class="text-left px-6 py-3 font-medium text-gray-600">Total</th>
                             <th class="text-left px-6 py-3 font-medium text-gray-600">Status</th>
                             <th class="text-left px-6 py-3 font-medium text-gray-600">Payment</th>
+                            <th class="text-left px-6 py-3 font-medium text-gray-600">Txn ID</th>
                             <th class="text-left px-6 py-3 font-medium text-gray-600">Date</th>
                             <th class="text-right px-6 py-3 font-medium text-gray-600">Actions</th>
                         </tr>
@@ -138,6 +196,13 @@
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $payColors[$order->payment_status] ?? 'bg-gray-50 text-gray-700' }}">
                                         {{ ucfirst($order->payment_status) }}
                                     </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if($order->transaction_id)
+                                        <code class="text-xs bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded font-mono">{{ $order->transaction_id }}</code>
+                                    @else
+                                        <span class="text-xs text-gray-400">—</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="text-gray-700">{{ $order->created_at->format('d M Y') }}</div>

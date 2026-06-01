@@ -90,4 +90,86 @@ class OrderController extends Controller
         $order->delete();
         return redirect()->route('admin.orders.index')->with('success', 'Order deleted successfully.');
     }
+
+    public function exportCsv(Request $request)
+    {
+        $query = Order::with('items.product')->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                  ->orWhere('customer_name', 'like', "%{$search}%")
+                  ->orWhere('customer_email', 'like', "%{$search}%")
+                  ->orWhere('customer_phone', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $orders = $query->get();
+
+        $filename = 'orders_' . now()->format('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($orders) {
+            $file = fopen('php://output', 'w');
+
+            fputcsv($file, [
+                'Order #', 'Date', 'Customer Name', 'Email', 'Phone',
+                'Shipping Address', 'City', 'State', 'Pincode',
+                'Items', 'Subtotal', 'Shipping', 'Coupon Code', 'Coupon Discount', 'Total',
+                'Payment Method', 'Payment Status', 'Order Status', 'Transaction ID',
+            ]);
+
+            foreach ($orders as $order) {
+                $itemsList = $order->items->map(function ($item) {
+                    return $item->product_title . ' x' . $item->quantity;
+                })->implode('; ');
+
+                fputcsv($file, [
+                    $order->order_number,
+                    $order->created_at->format('d/m/Y H:i'),
+                    $order->customer_name,
+                    $order->customer_email,
+                    $order->customer_phone,
+                    $order->shipping_address,
+                    $order->shipping_city,
+                    $order->shipping_state,
+                    $order->shipping_pincode,
+                    $itemsList,
+                    $order->subtotal,
+                    $order->shipping_charge,
+                    $order->coupon_code ?? '',
+                    $order->coupon_discount,
+                    $order->total,
+                    ucfirst($order->payment_method),
+                    ucfirst($order->payment_status),
+                    ucfirst($order->status),
+                    $order->transaction_id ?? '',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

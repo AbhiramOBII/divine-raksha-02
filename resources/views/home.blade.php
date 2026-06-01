@@ -1,6 +1,45 @@
 @include('partials.header')
 
     <!-- ============================================ -->
+    <!-- Offer Marquee                                -->
+    <!-- ============================================ -->
+    @if(setting('marquee_enabled') == '1' && setting('marquee_text'))
+    <div class="bg-gradient-to-r from-sacred-gold via-yellow-500 to-sacred-gold overflow-hidden">
+        <div class="marquee-container py-2">
+            <div class="marquee-content">
+                @php
+                    $messages = array_map('trim', explode('|', setting('marquee_text')));
+                @endphp
+                @foreach($messages as $msg)
+                    <span class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-900 whitespace-nowrap px-8">
+                        <span class="text-divine-red">&#9733;</span>
+                        {{ $msg }}
+                    </span>
+                @endforeach
+                @foreach($messages as $msg)
+                    <span class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-900 whitespace-nowrap px-8">
+                        <span class="text-divine-red">&#9733;</span>
+                        {{ $msg }}
+                    </span>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    <style>
+        .marquee-container { width: 100%; overflow: hidden; }
+        .marquee-content {
+            display: inline-flex;
+            animation: marquee-scroll 30s linear infinite;
+        }
+        .marquee-content:hover { animation-play-state: paused; }
+        @keyframes marquee-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
+    @endif
+
+    <!-- ============================================ -->
     <!-- ROW 1: Hero Slider                           -->
     <!-- ============================================ -->
     <section class="relative">
