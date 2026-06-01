@@ -190,13 +190,54 @@
             </div>
 
             <!-- Shipping Address -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h3 class="font-semibold text-gray-900 mb-3">Shipping Address</h3>
-                <p class="text-sm text-gray-600 leading-relaxed">
-                    {{ $order->shipping_address }}<br>
-                    {{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_pincode }}<br>
-                    {{ $order->shipping_country }}
-                </p>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6" x-data="{ editing: false }">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold text-gray-900">Shipping Address</h3>
+                    <button type="button" @click="editing = !editing" class="text-xs text-royal-blue hover:text-deep-royal font-medium">
+                        <span x-show="!editing">Edit</span>
+                        <span x-show="editing" x-cloak>Cancel</span>
+                    </button>
+                </div>
+
+                <!-- Display Mode -->
+                <div x-show="!editing">
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        {{ $order->shipping_address }}<br>
+                        {{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_pincode }}<br>
+                        {{ $order->shipping_country }}
+                    </p>
+                </div>
+
+                <!-- Edit Mode -->
+                <form x-show="editing" x-cloak method="POST" action="{{ route('admin.orders.updateShipping', $order) }}" class="space-y-3">
+                    @csrf
+                    @method('PATCH')
+                    <div>
+                        <label class="text-xs font-medium text-gray-500">Address</label>
+                        <textarea name="shipping_address" rows="2" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">{{ old('shipping_address', $order->shipping_address) }}</textarea>
+                        @error('shipping_address') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-medium text-gray-500">City</label>
+                            <input type="text" name="shipping_city" value="{{ old('shipping_city', $order->shipping_city) }}" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+                            @error('shipping_city') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-500">State</label>
+                            <input type="text" name="shipping_state" value="{{ old('shipping_state', $order->shipping_state) }}" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+                            @error('shipping_state') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-500">Pincode</label>
+                        <input type="text" name="shipping_pincode" value="{{ old('shipping_pincode', $order->shipping_pincode) }}" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue">
+                        @error('shipping_pincode') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                    <button type="submit" class="w-full px-4 py-2 bg-royal-blue text-white text-sm font-medium rounded-lg hover:bg-deep-royal transition-colors">
+                        Save Address
+                    </button>
+                </form>
             </div>
 
             <!-- Billing Address -->

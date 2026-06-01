@@ -51,6 +51,7 @@ Route::middleware('admin.auth')->group(function () {
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
     Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
     Route::patch('orders/{order}/payment-status', [OrderController::class, 'updatePaymentStatus'])->name('admin.orders.updatePaymentStatus');
+    Route::patch('orders/{order}/shipping', [OrderController::class, 'updateShipping'])->name('admin.orders.updateShipping');
     Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
     Route::get('orders-export/csv', [OrderController::class, 'exportCsv'])->name('admin.orders.exportCsv');
 

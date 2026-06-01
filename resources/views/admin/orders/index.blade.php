@@ -36,6 +36,43 @@
         </div>
     </div>
 
+    <!-- Product Report -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-6" x-data="{ open: false }">
+        <button @click="open = !open" class="w-full flex items-center justify-between px-6 py-4 text-left">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-royal-blue/10 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 text-sm">Product Order Summary</h3>
+                    <p class="text-xs text-gray-500">{{ now()->format('d M Y') }} — {{ $productSummary->count() }} products ordered</p>
+                </div>
+            </div>
+            <svg class="w-5 h-5 text-gray-400 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+
+        <div x-show="open" x-cloak x-transition class="border-t border-gray-100 px-6 py-4">
+            @if($productSummary->isNotEmpty())
+                <div class="space-y-2 max-h-80 overflow-y-auto">
+                    @foreach($productSummary as $item)
+                        <div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900 truncate">{{ $item->product_name }}</p>
+                                <p class="text-xs text-gray-500">{{ $item->order_count }} {{ Str::plural('order', $item->order_count) }} · {{ $item->total_qty }} {{ Str::plural('unit', $item->total_qty) }}</p>
+                            </div>
+                            <a href="{{ route('admin.orders.index', ['search' => $item->product_name]) }}"
+                               class="ml-3 shrink-0 text-xs font-medium text-royal-blue hover:text-deep-royal px-3 py-1.5 bg-royal-blue/5 rounded-lg hover:bg-royal-blue/10 transition-colors">
+                                View Orders →
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-sm text-gray-500 text-center py-4">No product orders found.</p>
+            @endif
+        </div>
+    </div>
+
     <!-- Filters -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6" x-data="orderFilters()">
         <form method="GET" action="{{ route('admin.orders.index') }}" class="space-y-4">
@@ -159,6 +196,9 @@
                                     <a href="{{ route('admin.orders.show', $order) }}" class="font-semibold text-royal-blue hover:text-deep-royal">
                                         {{ $order->order_number }}
                                     </a>
+                                    @foreach($order->items as $item)
+                                        <div class="text-xs text-gray-400 mt-0.5">{{ $item->product->title ?? 'N/A' }} × {{ $item->quantity }}</div>
+                                    @endforeach
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="font-medium text-gray-900">{{ $order->customer_name }}</div>
@@ -171,31 +211,48 @@
                                     <span class="font-semibold text-gray-900">₹{{ number_format($order->total, 2) }}</span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    @php
-                                        $statusColors = [
-                                            'pending' => 'bg-yellow-50 text-yellow-700',
-                                            'processing' => 'bg-blue-50 text-blue-700',
-                                            'shipped' => 'bg-indigo-50 text-indigo-700',
-                                            'delivered' => 'bg-green-50 text-green-700',
-                                            'cancelled' => 'bg-red-50 text-red-700',
-                                        ];
-                                    @endphp
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$order->status] ?? 'bg-gray-50 text-gray-700' }}">
-                                        {{ ucfirst($order->status) }}
-                                    </span>
+                                    <form method="POST" action="{{ route('admin.orders.updateStatus', $order) }}" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        @php
+                                            $statusStyles = [
+                                                'pending' => 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                                                'processing' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                                'shipped' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                                                'delivered' => 'bg-green-50 text-green-700 border-green-200',
+                                                'cancelled' => 'bg-red-50 text-red-700 border-red-200',
+                                            ];
+                                        @endphp
+                                        <select name="status" onchange="this.form.submit()"
+                                                class="text-xs font-medium rounded-full px-2.5 py-1 border cursor-pointer appearance-none {{ $statusStyles[$order->status] ?? 'bg-gray-50 text-gray-700 border-gray-200' }}">
+                                            <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Processing</option>
+                                            <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped</option>
+                                            <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Delivered</option>
+                                            <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                        </select>
+                                    </form>
                                 </td>
                                 <td class="px-6 py-4">
-                                    @php
-                                        $payColors = [
-                                            'pending' => 'bg-yellow-50 text-yellow-700',
-                                            'paid' => 'bg-green-50 text-green-700',
-                                            'failed' => 'bg-red-50 text-red-700',
-                                            'refunded' => 'bg-purple-50 text-purple-700',
-                                        ];
-                                    @endphp
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $payColors[$order->payment_status] ?? 'bg-gray-50 text-gray-700' }}">
-                                        {{ ucfirst($order->payment_status) }}
-                                    </span>
+                                    <form method="POST" action="{{ route('admin.orders.updatePaymentStatus', $order) }}" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        @php
+                                            $payStyles = [
+                                                'pending' => 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                                                'paid' => 'bg-green-50 text-green-700 border-green-200',
+                                                'failed' => 'bg-red-50 text-red-700 border-red-200',
+                                                'refunded' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                            ];
+                                        @endphp
+                                        <select name="payment_status" onchange="this.form.submit()"
+                                                class="text-xs font-medium rounded-full px-2.5 py-1 border cursor-pointer appearance-none {{ $payStyles[$order->payment_status] ?? 'bg-gray-50 text-gray-700 border-gray-200' }}">
+                                            <option value="pending" {{ $order->payment_status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="paid" {{ $order->payment_status === 'paid' ? 'selected' : '' }}>Paid</option>
+                                            <option value="failed" {{ $order->payment_status === 'failed' ? 'selected' : '' }}>Failed</option>
+                                            <option value="refunded" {{ $order->payment_status === 'refunded' ? 'selected' : '' }}>Refunded</option>
+                                        </select>
+                                    </form>
                                 </td>
                                 <td class="px-6 py-4">
                                     @if($order->transaction_id)

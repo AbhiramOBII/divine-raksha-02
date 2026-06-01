@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with('items')->latest();
+        $query = Order::with('items.product')->latest();
 
         // Search
         if ($request->filled('search')) {
@@ -19,7 +21,12 @@ class OrderController extends Controller
                 $q->where('order_number', 'like', "%{$search}%")
                   ->orWhere('customer_name', 'like', "%{$search}%")
                   ->orWhere('customer_email', 'like', "%{$search}%")
-                  ->orWhere('customer_phone', 'like', "%{$search}%");
+                  ->orWhere('customer_phone', 'like', "%{$search}%")
+                  ->orWhereHas('items', function ($itemQuery) use ($search) {
+                      $itemQuery->whereHas('product', function ($prodQuery) use ($search) {
+                          $prodQuery->where('title', 'like', "%{$search}%");
+                      });
+                  });
             });
         }
 
@@ -54,7 +61,23 @@ class OrderController extends Controller
             'revenue' => Order::where('payment_status', 'paid')->sum('total'),
         ];
 
-        return view('admin.orders.index', compact('orders', 'stats'));
+        // Product-based order summary
+        $productSummary = OrderItem::query()
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->whereNotIn('orders.status', ['cancelled'])
+            ->select(
+                'products.id as product_id',
+                'products.title as product_name',
+                'products.slug as product_slug',
+                DB::raw('COUNT(DISTINCT orders.id) as order_count'),
+                DB::raw('SUM(order_items.quantity) as total_qty')
+            )
+            ->groupBy('products.id', 'products.title', 'products.slug')
+            ->orderByDesc('order_count')
+            ->get();
+
+        return view('admin.orders.index', compact('orders', 'stats', 'productSummary'));
     }
 
     public function show(Order $order)
@@ -83,6 +106,20 @@ class OrderController extends Controller
         $order->update(['payment_status' => $request->payment_status]);
 
         return back()->with('success', 'Payment status updated to ' . ucfirst($request->payment_status));
+    }
+
+    public function updateShipping(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'shipping_address' => 'required|string|max:500',
+            'shipping_city' => 'required|string|max:100',
+            'shipping_state' => 'required|string|max:100',
+            'shipping_pincode' => 'required|string|max:10',
+        ]);
+
+        $order->update($validated);
+
+        return back()->with('success', 'Shipping address updated successfully.');
     }
 
     public function destroy(Order $order)
