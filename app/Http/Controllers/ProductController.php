@@ -12,6 +12,16 @@ class ProductController extends Controller
     {
         $query = Product::active()->with('category', 'stocks');
 
+        // Search by keyword
+        if ($request->filled('q')) {
+            $search = $request->q;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('short_description', 'like', "%{$search}%");
+            });
+        }
+
         // Filter by bestseller
         if ($request->filled('bestseller')) {
             $query->where('bestseller', true);
@@ -89,6 +99,34 @@ class ProductController extends Controller
         return view('products.index', compact(
             'products', 'categories', 'attributes', 'sizes', 'purposes', 'raashis', 'numerology'
         ));
+    }
+
+    public function suggestions(Request $request)
+    {
+        $q = trim($request->get('q', ''));
+
+        if (mb_strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        try {
+            $products = Product::where('status', true)
+                ->where('title', 'like', '%' . $q . '%')
+                ->take(6)
+                ->get(['id', 'title', 'slug', 'selling_price']);
+
+            $results = $products->map(function ($p) {
+                return [
+                    'title' => $p->title,
+                    'url'   => url('/products/' . $p->slug),
+                    'price' => '₹' . number_format($p->selling_price),
+                ];
+            })->values();
+
+            return response()->json($results);
+        } catch (\Exception $e) {
+            return response()->json([]);
+        }
     }
 
     public function show(Product $product)

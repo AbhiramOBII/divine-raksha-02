@@ -14,6 +14,7 @@ Route::get('/shop-by-raashi/{raashi?}', [ProductController::class, 'shopByRaashi
 Route::get('/shop-by-numerology/{number?}', [ProductController::class, 'shopByNumerology'])->name('shop.numerology');
 Route::get('/bestsellers', [ProductController::class, 'bestsellers'])->name('shop.bestsellers');
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/search/suggestions', [ProductController::class, 'suggestions'])->name('search.suggestions');
 
 // Cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');

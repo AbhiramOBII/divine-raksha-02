@@ -282,6 +282,11 @@
 
                     <!-- Right Side Actions -->
                     <div class="flex items-center space-x-2 sm:space-x-4">
+                        <!-- Search -->
+                        <button onclick="window.dispatchEvent(new CustomEvent('open-search'))" class="text-pure-white hover:text-sacred-gold transition-colors duration-300">
+                            <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </button>
+
                         <!-- User Account -->
                         @auth
                             <div class="relative" x-data="{ open: false }">
@@ -453,4 +458,114 @@
             </div>
         </div>
     </header>
+
+    <!-- Search Overlay -->
+    <div x-data="searchOverlay()" @open-search.window="open()" x-show="isOpen" x-cloak
+         class="fixed inset-0 z-[100] flex items-start justify-center pt-20 sm:pt-32"
+         @keydown.escape.window="close()">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="close()" x-show="isOpen" x-transition.opacity></div>
+
+        <!-- Search Panel -->
+        <div class="relative w-full max-w-2xl mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden" x-show="isOpen" x-transition>
+            <!-- Search Input -->
+            <div class="flex items-center border-b border-gray-100">
+                <svg class="w-5 h-5 ml-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" x-ref="searchInput" x-model="query" @input.debounce.300ms="search()"
+                       @keydown.enter="goToResults()"
+                       placeholder="Search for products..."
+                       class="w-full px-4 py-5 text-lg border-0 focus:ring-0 focus:outline-none placeholder-gray-400">
+                <button @click="close()" class="mr-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Results -->
+            <div class="max-h-80 overflow-y-auto">
+                <!-- Loading -->
+                <div x-show="loading" class="p-6 text-center text-sm text-gray-500">Searching...</div>
+
+                <!-- Suggestions -->
+                <template x-if="!loading && results.length > 0">
+                    <div class="py-2">
+                        <template x-for="item in results" :key="item.url">
+                            <a :href="item.url" class="flex items-center justify-between px-6 py-3 hover:bg-gray-50 transition-colors">
+                                <span class="text-sm font-medium text-gray-900" x-text="item.title"></span>
+                                <span class="text-sm text-royal-blue font-semibold" x-text="item.price"></span>
+                            </a>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- No Results -->
+                <div x-show="!loading && searched && results.length === 0" class="p-6 text-center text-sm text-gray-500">
+                    No products found for "<span x-text="query"></span>"
+                </div>
+
+                <!-- View All -->
+                <div x-show="!loading && results.length > 0" class="border-t border-gray-100 p-3">
+                    <a :href="'/products?q=' + encodeURIComponent(query)"
+                       class="block text-center text-sm font-medium text-royal-blue hover:text-deep-royal py-2 rounded-lg hover:bg-royal-blue/5 transition-colors">
+                        View all results &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchOverlay() {
+            return {
+                isOpen: false,
+                query: '',
+                results: [],
+                loading: false,
+                searched: false,
+                open() {
+                    this.isOpen = true;
+                    this.searched = false;
+                    this.$nextTick(() => { if(this.$refs.searchInput) this.$refs.searchInput.focus(); });
+                },
+                close() {
+                    this.isOpen = false;
+                    this.query = '';
+                    this.results = [];
+                    this.searched = false;
+                },
+                goToResults() {
+                    if (this.query.trim().length >= 2) {
+                        window.location.href = '/products?q=' + encodeURIComponent(this.query.trim());
+                    }
+                },
+                search() {
+                    const q = this.query.trim();
+                    if (q.length < 2) {
+                        this.results = [];
+                        this.searched = false;
+                        return;
+                    }
+                    this.loading = true;
+                    this.searched = true;
+                    const self = this;
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', '/search/suggestions?q=' + encodeURIComponent(q));
+                    xhr.setRequestHeader('Accept', 'application/json');
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                    xhr.onload = function() {
+                        self.loading = false;
+                        try {
+                            self.results = JSON.parse(xhr.responseText);
+                        } catch(e) {
+                            self.results = [];
+                        }
+                    };
+                    xhr.onerror = function() {
+                        self.loading = false;
+                        self.results = [];
+                    };
+                    xhr.send();
+                }
+            }
+        }
+    </script>
 
