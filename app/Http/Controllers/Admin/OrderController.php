@@ -7,6 +7,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderStatusUpdated;
 
 class OrderController extends Controller
 {
@@ -92,7 +94,21 @@ class OrderController extends Controller
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
         ]);
 
+        $oldStatus = $order->status;
         $order->update(['status' => $request->status]);
+
+        // Send status update email to customer and admin
+        if ($oldStatus !== $request->status) {
+            try {
+                $order->load('items');
+                $adminEmail = setting('admin_order_email', 'rakshadivine@gmail.com');
+                Mail::to($order->customer_email)
+                    ->cc($adminEmail)
+                    ->send(new OrderStatusUpdated($order, $oldStatus));
+            } catch (\Exception $e) {
+                \Log::error('Order status email failed: ' . $e->getMessage());
+            }
+        }
 
         return back()->with('success', 'Order status updated to ' . ucfirst($request->status));
     }

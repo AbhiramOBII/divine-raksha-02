@@ -8,6 +8,8 @@ use App\Models\Product;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderConfirmation;
 
 class CheckoutController extends Controller
 {
@@ -217,8 +219,18 @@ class CheckoutController extends Controller
             }
         }
 
-        // For COD, clear cart and redirect to success
+        // For COD, send confirmation email and redirect to success
         if ($request->payment_method === 'cod') {
+            try {
+                $order->load('items');
+                $adminEmail = setting('admin_order_email', 'rakshadivine@gmail.com');
+                Mail::to($order->customer_email)
+                    ->cc($adminEmail)
+                    ->send(new OrderConfirmation($order));
+            } catch (\Exception $e) {
+                \Log::error('Order confirmation email failed: ' . $e->getMessage());
+            }
+
             session()->forget(['cart', 'coupon']);
 
             if ($request->expectsJson()) {

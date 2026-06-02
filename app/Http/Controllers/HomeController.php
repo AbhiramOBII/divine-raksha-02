@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Slider;
 use Illuminate\Http\Request;
@@ -36,5 +37,26 @@ class HomeController extends Controller
         $latestBlogs = Blog::active()->with('category')->latest()->take(4)->get();
 
         return view('home', compact('sliders', 'bestsellers', 'purposes', 'raashis', 'numerology', 'latestBlogs'));
+    }
+
+    public function recentOrders()
+    {
+        $orders = Order::with('items')
+            ->where('payment_status', 'paid')
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(function ($order) {
+                $firstItem = $order->items->first();
+                $name = explode(' ', $order->customer_name)[0];
+                return [
+                    'name' => $name,
+                    'city' => $order->shipping_city,
+                    'product' => $firstItem ? $firstItem->product_title : 'a sacred item',
+                    'time' => $order->created_at->diffForHumans(),
+                ];
+            });
+
+        return response()->json($orders);
     }
 }

@@ -15,6 +15,7 @@ Route::get('/shop-by-numerology/{number?}', [ProductController::class, 'shopByNu
 Route::get('/bestsellers', [ProductController::class, 'bestsellers'])->name('shop.bestsellers');
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/search/suggestions', [ProductController::class, 'suggestions'])->name('search.suggestions');
+Route::get('/api/recent-orders', [HomeController::class, 'recentOrders'])->name('api.recent-orders');
 
 // Cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');

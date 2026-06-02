@@ -6,6 +6,8 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Razorpay\Api\Api;
 use Razorpay\Api\Errors\SignatureVerificationError;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderConfirmation;
 
 class PaymentController extends Controller
 {
@@ -91,6 +93,17 @@ class PaymentController extends Controller
                 'transaction_id' => $request->razorpay_payment_id,
                 'payment_status' => 'paid',
             ]);
+
+            // Send order confirmation email to customer and admin
+            try {
+                $order->load('items');
+                $adminEmail = setting('admin_order_email', 'rakshadivine@gmail.com');
+                Mail::to($order->customer_email)
+                    ->cc($adminEmail)
+                    ->send(new OrderConfirmation($order));
+            } catch (\Exception $e) {
+                \Log::error('Order confirmation email failed: ' . $e->getMessage());
+            }
 
             // Clear cart and coupon
             session()->forget(['cart', 'coupon']);
