@@ -15,7 +15,7 @@ class HomeController extends Controller
         $sliders = Slider::active()->ordered()->get();
         $bestsellers = Product::active()->bestseller()->with('category')->limit(10)->get();
 
-        $purposes = ['Wealth', 'Love', 'Health', 'Luck', 'Protection', 'Peace', 'Courage', 'Balance'];
+        $purposes = ['Wealth', 'Love', 'Health', 'Luck', 'Protection', 'Peace', 'Courage', 'Balance', 'Education', 'Spiritual Growth', 'Career', 'Emotional Healing', 'Creativity', 'Success', 'Focus', 'Relationships'];
 
         $raashis = [
             'Mesha' => ['label' => 'Aries', 'icon' => 'aries.svg'],

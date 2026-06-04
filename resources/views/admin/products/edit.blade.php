@@ -277,6 +277,8 @@
                         'options' => [
                             'Wealth' => 'Wealth', 'Love' => 'Love', 'Health' => 'Health', 'Luck' => 'Luck',
                             'Protection' => 'Protection', 'Peace' => 'Peace', 'Courage' => 'Courage', 'Balance' => 'Balance',
+                            'Education' => 'Education', 'Spiritual Growth' => 'Spiritual Growth', 'Career' => 'Career', 'Emotional Healing' => 'Emotional Healing',
+                            'Creativity' => 'Creativity', 'Success' => 'Success', 'Focus' => 'Focus', 'Relationships' => 'Relationships',
                         ],
                         'selected' => old('shop_purpose', $product->shop_purpose ?? []),
                     ])

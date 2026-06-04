@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderConfirmation;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -80,6 +82,107 @@ class OrderController extends Controller
             ->get();
 
         return view('admin.orders.index', compact('orders', 'stats', 'productSummary'));
+    }
+
+    public function create()
+    {
+        $products = Product::active()->orderBy('title')->get();
+        return view('admin.orders.create', compact('products'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'customer_email' => 'required|email|max:255',
+            'customer_phone' => 'required|string|max:20',
+            'shipping_address' => 'required|string|max:500',
+            'shipping_city' => 'required|string|max:100',
+            'shipping_state' => 'required|string|max:100',
+            'shipping_pincode' => 'required|string|max:10',
+            'payment_method' => 'required|in:cod,online,bank_transfer,other',
+            'payment_status' => 'required|in:pending,paid',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.size' => 'nullable|string|max:50',
+            'shipping_charge' => 'nullable|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $subtotal = 0;
+            $itemsData = [];
+
+            foreach ($request->items as $item) {
+                $product = Product::findOrFail($item['product_id']);
+                $price = $product->selling_price;
+                $qty = $item['quantity'];
+                $itemSubtotal = $price * $qty;
+                $subtotal += $itemSubtotal;
+
+                $itemsData[] = [
+                    'product_id' => $product->id,
+                    'product_title' => $product->title,
+                    'product_sku' => $product->sku ?? '',
+                    'price' => $price,
+                    'quantity' => $qty,
+                    'size' => $item['size'] ?? null,
+                    'subtotal' => $itemSubtotal,
+                ];
+            }
+
+            $shippingCharge = $request->shipping_charge ?? 0;
+            $discount = $request->discount ?? 0;
+            $total = $subtotal + $shippingCharge - $discount;
+
+            $order = Order::create([
+                'order_number' => Order::generateOrderNumber(),
+                'status' => 'processing',
+                'payment_status' => $request->payment_status,
+                'payment_method' => $request->payment_method,
+                'customer_name' => $request->customer_name,
+                'customer_email' => $request->customer_email,
+                'customer_phone' => $request->customer_phone,
+                'shipping_address' => $request->shipping_address,
+                'shipping_city' => $request->shipping_city,
+                'shipping_state' => $request->shipping_state,
+                'shipping_pincode' => $request->shipping_pincode,
+                'subtotal' => $subtotal,
+                'shipping_charge' => $shippingCharge,
+                'discount' => $discount,
+                'total' => $total,
+                'notes' => $request->notes,
+            ]);
+
+            foreach ($itemsData as $itemData) {
+                $order->items()->create($itemData);
+            }
+
+            DB::commit();
+
+            // Send confirmation email
+            if ($request->payment_status === 'paid') {
+                try {
+                    $order->load('items');
+                    $adminEmail = setting('admin_order_email', 'rakshadivine@gmail.com');
+                    Mail::to($order->customer_email)
+                        ->cc($adminEmail)
+                        ->send(new OrderConfirmation($order));
+                } catch (\Exception $e) {
+                    \Log::error('Admin create order - email failed: ' . $e->getMessage());
+                }
+            }
+
+            return redirect()->route('admin.orders.show', $order)
+                ->with('success', "Order #{$order->order_number} created successfully.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Failed to create order: ' . $e->getMessage());
+        }
     }
 
     public function show(Order $order)

@@ -92,7 +92,7 @@ class ProductController extends Controller
 
         $attributes = ['Natural', 'Blessed', 'Handcrafted', 'Organic'];
         $sizes = ['Small', 'Medium', 'Large', 'Extra Large'];
-        $purposes = ['Wealth', 'Love', 'Health', 'Luck', 'Protection', 'Peace', 'Courage', 'Balance'];
+        $purposes = ['Wealth', 'Love', 'Health', 'Luck', 'Protection', 'Peace', 'Courage', 'Balance', 'Education', 'Spiritual Growth', 'Career', 'Emotional Healing', 'Creativity', 'Success', 'Focus', 'Relationships'];
         $raashis = ['Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya', 'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena'];
         $numerology = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 

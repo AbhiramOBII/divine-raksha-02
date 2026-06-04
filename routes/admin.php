@@ -48,6 +48,8 @@ Route::middleware('admin.auth')->group(function () {
 
     // Orders
     Route::get('orders', [OrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('orders/create', [OrderController::class, 'create'])->name('admin.orders.create');
+    Route::post('orders', [OrderController::class, 'store'])->name('admin.orders.store');
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
     Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
     Route::patch('orders/{order}/payment-status', [OrderController::class, 'updatePaymentStatus'])->name('admin.orders.updatePaymentStatus');

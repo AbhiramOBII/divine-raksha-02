@@ -168,7 +168,7 @@
                         <tr class="border-b border-gray-50">
                             <td class="py-2 px-3 font-mono text-xs bg-gray-50 rounded">shop_purpose</td>
                             <td class="py-2 px-3">No</td>
-                            <td class="py-2 px-3">Pipe-separated: Wealth|Love|Health|Luck|Protection|Peace|Courage|Balance</td>
+                            <td class="py-2 px-3">Pipe-separated: Wealth|Love|Health|Luck|Protection|Peace|Courage|Balance|Education|Spiritual Growth|Career|Emotional Healing|Creativity|Success|Focus|Relationships</td>
                         </tr>
                         <tr class="border-b border-gray-50">
                             <td class="py-2 px-3 font-mono text-xs bg-gray-50 rounded">shop_by_raashi</td>

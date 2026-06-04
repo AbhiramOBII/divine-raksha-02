@@ -191,118 +191,41 @@
                 </div>
 
                 <!-- Purpose Icons Grid -->
+                @php
+                    $purposeIcons = [
+                        'Wealth' => '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z"/>',
+                        'Love' => '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>',
+                        'Health' => '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>',
+                        'Luck' => '<path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.7-6.3 4.7 2.3-7-6-4.6h7.6z"/>',
+                        'Protection' => '<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>',
+                        'Peace' => '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-6.06V8h2v5.94l3.47 2.06-.99 1.71L12 15.47l-3.48 2.24-.99-1.71L11 13.94z"/>',
+                        'Courage' => '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
+                        'Balance' => '<path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm6 9.09c0 4-2.55 7.7-6 8.83-3.45-1.13-6-4.82-6-8.83V6.31l6-2.12 6 2.12v4.78z"/>',
+                        'Education' => '<path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>',
+                        'Spiritual Growth' => '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-14h2v2h-2V6zm-1 4h4v2h-1v4h-2v-4h-1v-2z"/>',
+                        'Career' => '<path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>',
+                        'Emotional Healing' => '<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>',
+                        'Creativity' => '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/><path d="M7.5 12c.83 0 1.5-.67 1.5-1.5S8.33 9 7.5 9 6 9.67 6 10.5 6.67 12 7.5 12zm4.5-3c.83 0 1.5-.67 1.5-1.5S12.83 6 12 6s-1.5.67-1.5 1.5S11.17 9 12 9zm4.5 3c.83 0 1.5-.67 1.5-1.5S17.33 9 16.5 9 15 9.67 15 10.5s.67 1.5 1.5 1.5z"/>',
+                        'Success' => '<path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>',
+                        'Focus' => '<path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm-7 7H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm14-2h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4z"/>',
+                        'Relationships' => '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>',
+                    ];
+                @endphp
                 <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 sm:gap-5 lg:gap-6 max-w-7xl mx-auto">
-                    <!-- Wealth -->
-                    <a href="{{ route('shop.purpose', 'Wealth') }}" class="flex flex-col items-center group">
+                    @foreach($purposes as $purpose)
+                    <a href="{{ route('shop.purpose', $purpose) }}" class="flex flex-col items-center group">
                         <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
                             <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
                                     <svg class="w-8 h-8 sm:w-9 sm:h-9 text-sacred-gold" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z"></path>
+                                        {!! $purposeIcons[$purpose] ?? '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>' !!}
                                     </svg>
                                 </div>
                             </div>
                         </div>
-                        <span class="text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-royal-blue transition-colors duration-300">Wealth</span>
+                        <span class="text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-royal-blue transition-colors duration-300 text-center">{{ $purpose }}</span>
                     </a>
-
-                    <!-- Love -->
-                    <a href="{{ route('shop.purpose', 'Love') }}" class="flex flex-col items-center group">
-                        <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
-                            <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
-                                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
-                                    <svg class="w-8 h-8 sm:w-9 sm:h-9 text-sacred-gold" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-royal-blue transition-colors duration-300">Love</span>
-                    </a>
-
-                    <!-- Health -->
-                    <a href="{{ route('shop.purpose', 'Health') }}" class="flex flex-col items-center group">
-                        <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
-                            <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
-                                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
-                                    <svg class="w-8 h-8 sm:w-9 sm:h-9 text-sacred-gold" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-royal-blue transition-colors duration-300">Health</span>
-                    </a>
-
-                    <!-- Luck -->
-                    <a href="{{ route('shop.purpose', 'Luck') }}" class="flex flex-col items-center group">
-                        <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
-                            <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
-                                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
-                                    <svg class="w-8 h-8 sm:w-9 sm:h-9 text-sacred-gold" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.7-6.3 4.7 2.3-7-6-4.6h7.6z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-royal-blue transition-colors duration-300">Luck</span>
-                    </a>
-
-                    <!-- Protection -->
-                    <a href="{{ route('shop.purpose', 'Protection') }}" class="flex flex-col items-center group">
-                        <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
-                            <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
-                                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
-                                    <svg class="w-8 h-8 sm:w-9 sm:h-9 text-sacred-gold" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-royal-blue transition-colors duration-300">Protection</span>
-                    </a>
-
-                    <!-- Peace -->
-                    <a href="{{ route('shop.purpose', 'Peace') }}" class="flex flex-col items-center group">
-                        <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
-                            <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
-                                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
-                                    <svg class="w-8 h-8 sm:w-9 sm:h-9 text-sacred-gold" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-royal-blue transition-colors duration-300">Peace</span>
-                    </a>
-
-                    <!-- Courage -->
-                    <a href="{{ route('shop.purpose', 'Courage') }}" class="flex flex-col items-center group">
-                        <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
-                            <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
-                                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
-                                    <svg class="w-8 h-8 sm:w-9 sm:h-9 text-sacred-gold" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-royal-blue transition-colors duration-300">Courage</span>
-                    </a>
-
-                    <!-- Balance -->
-                    <a href="{{ route('shop.purpose', 'Balance') }}" class="flex flex-col items-center group">
-                        <div class="relative mb-3 transition-all duration-300 group-hover:-translate-y-1">
-                            <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center shadow-md border border-gray-100 group-hover:shadow-xl group-hover:border-sacred-gold/40 transition-all duration-300">
-                                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-royal-blue to-[#011455] flex items-center justify-center">
-                                    <svg class="w-8 h-8 sm:w-9 sm:h-9 text-sacred-gold" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm6 9.09c0 4-2.55 7.7-6 8.83-3.45-1.13-6-4.82-6-8.83V6.31l6-2.12 6 2.12v4.78z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-royal-blue transition-colors duration-300">Balance</span>
-                    </a>
+                    @endforeach
                 </div>
             </div>
         </section>
