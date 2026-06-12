@@ -221,6 +221,81 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="bg-pure-white font-coolvetica">
+
+    <!-- Preloader -->
+    <style>
+        #preloader {
+            background: linear-gradient(135deg, #ffffff 0%, #fdf8f0 100%);
+            transition: opacity 0.4s ease;
+        }
+        #preloader .om-ring {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            border: 3px solid rgba(212,175,55,0.2);
+            border-top-color: #d4af37;
+            border-right-color: #d4af37;
+            animation: dr-spin 1.2s cubic-bezier(0.4,0,0.2,1) infinite;
+            position: absolute;
+        }
+        #preloader .om-ring-2 {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            border: 2px solid rgba(30,58,138,0.12);
+            border-bottom-color: #1e3a8a;
+            animation: dr-spin-rev 1.8s linear infinite;
+            position: absolute;
+        }
+        #preloader .om-text {
+            font-size: 1.6rem;
+            color: #d4af37;
+            animation: dr-pulse 1.8s ease-in-out infinite;
+            line-height: 1;
+            position: relative;
+            z-index: 1;
+        }
+        #preloader .dr-dots span {
+            display: inline-block;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: #d4af37;
+            animation: dr-dot 1.2s ease-in-out infinite;
+        }
+        #preloader .dr-dots span:nth-child(2) { animation-delay: 0.2s; }
+        #preloader .dr-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dr-spin    { to { transform: rotate(360deg); } }
+        @keyframes dr-spin-rev{ to { transform: rotate(-360deg); } }
+        @keyframes dr-pulse   { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.7;transform:scale(0.92)} }
+        @keyframes dr-dot     { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+    </style>
+    <div id="preloader" class="fixed inset-0 z-[200] flex flex-col items-center justify-center gap-5">
+        <!-- Logo -->
+        <img src="{{ asset('images/logo-divine-raksha.webp') }}" alt="Divine Raksha" class="h-16 w-auto">
+
+        <!-- Animated Om ring -->
+        <div class="relative flex items-center justify-center" style="width:80px;height:80px;">
+            <div class="om-ring"></div>
+            <div class="om-ring-2"></div>
+            <span class="om-text">ॐ</span>
+        </div>
+
+        <!-- Dots -->
+        <div class="dr-dots flex items-center gap-1.5">
+            <span></span><span></span><span></span>
+        </div>
+
+        <!-- Tagline -->
+        <p class="text-xs tracking-widest uppercase" style="color:#1e3a8a;opacity:0.5;letter-spacing:0.18em;">Sacred Protection & Spiritual Balance</p>
+    </div>
+    <script>
+        window.addEventListener('load', function () {
+            var el = document.getElementById('preloader');
+            if (el) {
+                el.style.opacity = '0';
+                setTimeout(function () { el.style.display = 'none'; }, 400);
+            }
+        });
+    </script>
+
     <!-- Header -->
     <header class="relative z-50">
         <!-- Top Bar -->
