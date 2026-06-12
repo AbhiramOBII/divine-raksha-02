@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
-use App\Models\Order;
+use App\Models\FomoData;
 use App\Models\Product;
 use App\Models\Slider;
 use Illuminate\Http\Request;
@@ -41,22 +41,29 @@ class HomeController extends Controller
 
     public function recentOrders()
     {
-        $orders = Order::with('items')
-            ->where('payment_status', 'paid')
-            ->latest()
-            ->take(10)
-            ->get()
-            ->map(function ($order) {
-                $firstItem = $order->items->first();
-                $name = explode(' ', $order->customer_name)[0];
-                return [
-                    'name' => $name,
-                    'city' => $order->shipping_city,
-                    'product' => $firstItem ? $firstItem->product_title : 'a sacred item',
-                    'time' => $order->created_at->diffForHumans(),
-                ];
-            });
+        $fomoEntries = FomoData::inRandomOrder()->limit(10)->get();
+        $products = Product::active()->inRandomOrder()->limit(20)->pluck('title')->toArray();
 
-        return response()->json($orders);
+        if ($fomoEntries->isEmpty() || empty($products)) {
+            return response()->json([]);
+        }
+
+        $timeOffsets = [
+            'Just now', '1 minute ago', '2 minutes ago', '3 minutes ago',
+            '5 minutes ago', '8 minutes ago', '12 minutes ago', '15 minutes ago',
+            '20 minutes ago', '25 minutes ago', '30 minutes ago', '45 minutes ago',
+            '1 hour ago', '2 hours ago',
+        ];
+
+        $result = $fomoEntries->map(function ($entry) use ($products, $timeOffsets) {
+            return [
+                'name' => $entry->fake_name,
+                'city' => $entry->fake_city,
+                'product' => $products[array_rand($products)],
+                'time' => $timeOffsets[array_rand($timeOffsets)],
+            ];
+        });
+
+        return response()->json($result);
     }
 }

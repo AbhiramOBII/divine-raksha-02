@@ -50,32 +50,52 @@
                 </div>
 
                 <div>
-                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">6. Intellectual Property</h2>
+                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">6. Shipping & Delivery</h2>
+                    <p>Shipping charges may be applicable depending on your order value and delivery location. The applicable shipping cost, if any, will be displayed clearly at checkout before you complete your purchase.</p>
+                    <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>Orders are typically delivered within <strong>5–7 business days</strong> from the date of dispatch, subject to product availability.</li>
+                        <li>Delivery timelines may vary due to remote locations, public holidays, or unforeseen logistics delays.</li>
+                        <li>We will notify you via email once your order has been dispatched.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">7. Returns & Refunds</h2>
+                    <p>Due to the sacred and personal nature of our products, <strong>returns are accepted only if the product is received in a damaged or broken condition</strong> due to transit or handling. We do not accept returns for change of mind, incorrect size selection, or subjective dissatisfaction.</p>
+                    <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>Damaged items must be reported within <strong>48 hours</strong> of delivery with photographic evidence.</li>
+                        <li>Approved claims will be resolved with a free replacement or full refund.</li>
+                        <li>Please refer to our <a href="{{ route('return-policy') }}" class="text-royal-blue hover:underline">Return Policy</a> page for the complete process.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">8. Intellectual Property</h2>
                     <p>All content on this website — including text, graphics, logos, images, and software — is the property of Divine Raksha or its content suppliers and is protected by intellectual property laws. You may not use, copy, or distribute any content without our prior written consent.</p>
                 </div>
 
                 <div>
-                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">7. User Accounts</h2>
+                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">9. User Accounts</h2>
                     <p>If you create an account on our website, you are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must notify us immediately of any unauthorized use.</p>
                 </div>
 
                 <div>
-                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">8. Limitation of Liability</h2>
+                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">10. Limitation of Liability</h2>
                     <p>Divine Raksha shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the website or purchase of products. Our total liability shall not exceed the amount paid by you for the specific product or service in question.</p>
                 </div>
 
                 <div>
-                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">9. Modifications</h2>
+                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">11. Modifications</h2>
                     <p>We reserve the right to update or modify these Terms of Use at any time without prior notice. Continued use of the website after changes constitutes acceptance of the revised terms.</p>
                 </div>
 
                 <div>
-                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">10. Governing Law</h2>
+                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">12. Governing Law</h2>
                     <p>These terms shall be governed by and construed in accordance with the laws of India. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the courts in Chennai, Tamil Nadu.</p>
                 </div>
 
                 <div>
-                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">11. Contact</h2>
+                    <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">13. Contact</h2>
                     <p>If you have any questions about these Terms of Use, please <a href="{{ route('contact') }}" class="text-royal-blue hover:underline">contact us</a>.</p>
                 </div>
 

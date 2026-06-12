@@ -25,6 +25,9 @@ class SiteSettingController extends Controller
         'marquee_text',
         'shipping_free_threshold',
         'shipping_cost',
+        'energize_cost',
+        'energize_label',
+        'admin_order_email',
     ];
 
     public function index()
@@ -52,6 +55,9 @@ class SiteSettingController extends Controller
             'marquee_text' => 'nullable|string|max:1000',
             'shipping_free_threshold' => 'nullable|numeric|min:0',
             'shipping_cost' => 'nullable|numeric|min:0',
+            'energize_cost' => 'nullable|numeric|min:0',
+            'energize_label' => 'nullable|string|max:255',
+            'admin_order_email' => 'nullable|email|max:255',
         ]);
 
         foreach ($this->settingKeys as $key) {

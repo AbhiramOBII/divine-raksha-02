@@ -18,13 +18,27 @@
 
             <div class="prose prose-sm sm:prose-base max-w-none text-gray-700 space-y-8">
 
-                <!-- Important Notice -->
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-5">
-                    <div class="flex items-start gap-3">
+                <!-- Key Policy Summary -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2">
+                    <div class="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl p-4">
+                        <svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        <div>
+                            <p class="text-xs font-semibold text-blue-800">Shipping</p>
+                            <p class="text-xs text-blue-700 mt-0.5">Shipping cost may be applicable based on order value.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 bg-green-50 border border-green-100 rounded-xl p-4">
+                        <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <div>
+                            <p class="text-xs font-semibold text-green-800">Delivery</p>
+                            <p class="text-xs text-green-700 mt-0.5">5–7 days based on availability.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
                         <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>
                         <div>
-                            <p class="font-semibold text-amber-800 text-sm mb-1">Important Notice</p>
-                            <p class="text-sm text-amber-700">Due to the sacred and personal nature of spiritual products, we follow a <strong>strict no-return policy</strong>. Returns are accepted <strong>only</strong> if items are received damaged or broken during transit.</p>
+                            <p class="text-xs font-semibold text-amber-800">Returns</p>
+                            <p class="text-xs text-amber-700 mt-0.5">Return only if product is damaged.</p>
                         </div>
                     </div>
                 </div>
@@ -44,9 +58,14 @@
                 <div>
                     <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-3">2. Damaged or Broken Items</h2>
                     <p>If you receive an item that is <strong>damaged, broken, or defective</strong> due to shipping or handling, we will gladly offer a replacement or refund. To claim this:</p>
+                    <div class="my-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-4">
+                        <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"></path></svg>
+                        <p class="text-sm text-red-700"><strong>Mandatory Unboxing Video:</strong> A continuous, unedited video of the package being opened (unboxing) is <strong>required</strong> for all damage claims. Claims submitted without a valid unboxing video will not be processed under any circumstances.</p>
+                    </div>
                     <ol class="list-decimal pl-5 mt-3 space-y-2">
+                        <li><strong>Record your unboxing</strong> — Start recording before opening the package and do not stop until the full contents are revealed.</li>
                         <li><strong>Report within 48 hours</strong> — Contact us within 48 hours of receiving the package.</li>
-                        <li><strong>Provide photographic evidence</strong> — Send clear photos of the damaged item and the shipping packaging showing visible damage.</li>
+                        <li><strong>Share the unboxing video and photos</strong> — Send your unboxing video along with clear photos of the damaged item and the shipping packaging.</li>
                         <li><strong>Do not discard the item</strong> — Keep the damaged product and its original packaging until the claim is resolved.</li>
                         <li><strong>Await our response</strong> — Our team will review your claim and respond within 2–3 business days.</li>
                     </ol>

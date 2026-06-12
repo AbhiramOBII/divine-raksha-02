@@ -28,7 +28,7 @@
                 </div>
             @endguest
 
-            <form id="checkout-form" action="{{ route('checkout.placeOrder') }}" method="POST" class="flex flex-col lg:flex-row gap-8" x-data="checkoutForm()" @submit.prevent="handleSubmit">
+            <form id="checkout-form" action="{{ route('checkout.placeOrder') }}" method="POST" class="flex flex-col lg:flex-row gap-8" x-data="checkoutForm({{ $energizeCost }}, {{ $total }})" @submit.prevent="handleSubmit">
                 @csrf
 
                 <!-- Left: Customer & Shipping -->
@@ -109,6 +109,7 @@
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Notes (Optional)</h3>
                         <textarea name="notes" rows="3" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue transition-colors text-sm" placeholder="Any special instructions for your order...">{{ old('notes') }}</textarea>
                     </div>
+
                 </div>
 
                 <!-- Right: Order Summary -->
@@ -131,6 +132,29 @@
                                 </div>
                             @endforeach
                         </div>
+
+                        @if(setting('energize_cost') !== null)
+                        <!-- Energize Your Product -->
+                        <div class="border-t border-gray-200 pt-4 mb-4">
+                            <label class="flex items-start gap-3 cursor-pointer group p-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 hover:border-amber-300 transition-colors">
+                                <input type="checkbox" name="energize_product" value="1"
+                                       x-model="energize"
+                                       class="mt-0.5 w-4 h-4 text-amber-500 border-amber-300 rounded focus:ring-amber-400 cursor-pointer flex-shrink-0">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-1.5 mb-0.5">
+                                        <svg class="w-3.5 h-3.5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
+                                        <span class="text-xs font-semibold text-amber-700">Energize Your Product</span>
+                                        @if($energizeCost > 0)
+                                            <span class="ml-auto inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700">+₹{{ number_format($energizeCost) }}</span>
+                                        @else
+                                            <span class="ml-auto inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">FREE</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-xs text-gray-500 leading-snug">{{ $energizeLabel }}</p>
+                                </div>
+                            </label>
+                        </div>
+                        @endif
 
                         <!-- Coupon Code -->
                         <div class="border-t border-gray-200 pt-4 mb-4" x-data="couponHandler()">
@@ -164,9 +188,18 @@
                                 <span>Coupon Discount</span>
                                 <span class="font-medium" id="coupon-discount-row">-₹<span id="coupon-discount-val">{{ number_format($couponDiscount) }}</span></span>
                             </div>
+                            @if(setting('energize_cost') !== null)
+                            <div x-show="energize" x-cloak class="flex justify-between text-amber-600">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
+                                    Energize Fee
+                                </span>
+                                <span class="font-medium">{{ $energizeCost > 0 ? '+₹' . number_format($energizeCost) : 'FREE' }}</span>
+                            </div>
+                            @endif
                             <div class="border-t border-gray-200 pt-3 flex justify-between">
                                 <span class="font-semibold text-gray-900">Total</span>
-                                <span class="font-bold text-xl text-royal-blue" id="order-total">₹{{ number_format($total) }}</span>
+                                <span class="font-bold text-xl text-royal-blue" x-text="'₹' + displayTotal()">₹{{ number_format($total) }}</span>
                             </div>
                         </div>
 
@@ -178,7 +211,12 @@
                             </span>
                         </button>
 
-                        <p class="text-xs text-gray-500 text-center mt-3">By placing this order, you agree to our Terms & Conditions.</p>
+                        <p class="text-xs text-gray-500 text-center mt-3">By placing this order, you agree to our <a href="{{ route('terms') }}" class="underline hover:text-royal-blue">Terms & Conditions</a>.</p>
+
+                        <div class="mt-3 flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-2.5">
+                            <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"></path></svg>
+                            <p class="text-xs text-red-700 leading-snug"><strong>Return Policy:</strong> Video proof of unboxing is <strong>mandatory</strong> to process any damage return claim. Claims without an unboxing video will not be accepted.</p>
+                        </div>
 
                         <!-- Error message -->
                         <div x-show="errorMessage" x-cloak class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -257,10 +295,18 @@
             }
         }
 
-        function checkoutForm() {
+        function checkoutForm(energizeCost, baseTotal) {
             return {
                 processing: false,
                 errorMessage: '',
+                energize: false,
+                energizeCost: energizeCost,
+                baseTotal: baseTotal,
+
+                displayTotal() {
+                    const total = this.baseTotal + (this.energize ? this.energizeCost : 0);
+                    return new Intl.NumberFormat('en-IN').format(total);
+                },
 
                 async handleSubmit() {
                     this.processing = true;

@@ -65,7 +65,10 @@ class CheckoutController extends Controller
 
         $user = Auth::user();
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'user', 'coupon', 'couponDiscount'));
+        $energizeCost = (float) setting('energize_cost', 0);
+        $energizeLabel = setting('energize_label', 'Energize my product with sacred mantras & intentions');
+
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'user', 'coupon', 'couponDiscount', 'energizeCost', 'energizeLabel'));
     }
 
     public function placeOrder(Request $request)
@@ -85,6 +88,7 @@ class CheckoutController extends Controller
             'shipping_state' => 'required|string|max:100',
             'shipping_pincode' => 'required|string|max:10',
             'payment_method' => 'required|in:cod,online',
+            'energize_product' => 'nullable|boolean',
         ]);
 
         // Calculate totals and validate stock
@@ -149,7 +153,13 @@ class CheckoutController extends Controller
             }
         }
 
-        $total = $subtotal + $shipping - $couponDiscount;
+        // Energize fee
+        $energizeFee = 0;
+        if ($request->boolean('energize_product')) {
+            $energizeFee = (float) setting('energize_cost', 0);
+        }
+
+        $total = $subtotal + $shipping - $couponDiscount + $energizeFee;
 
         // Create order
         $order = Order::create([
@@ -174,6 +184,7 @@ class CheckoutController extends Controller
             'discount' => $couponDiscount,
             'coupon_code' => $couponCode,
             'coupon_discount' => $couponDiscount,
+            'energize_fee' => $energizeFee,
             'total' => $total,
             'payment_method' => $request->payment_method,
             'notes' => $request->notes,

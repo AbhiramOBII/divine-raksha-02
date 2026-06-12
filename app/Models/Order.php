@@ -33,6 +33,7 @@ class Order extends Model
         'discount',
         'coupon_code',
         'coupon_discount',
+        'energize_fee',
         'total',
         'payment_method',
         'transaction_id',
@@ -49,6 +50,7 @@ class Order extends Model
             'shipping_charge' => 'decimal:2',
             'discount' => 'decimal:2',
             'coupon_discount' => 'decimal:2',
+            'energize_fee' => 'decimal:2',
             'total' => 'decimal:2',
         ];
     }

@@ -259,6 +259,51 @@
             </div>
         </div>
 
+        <!-- Energize Your Product -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-1">Energize Your Product</h2>
+            <p class="text-sm text-gray-500 mb-6">Allow customers to opt-in for energization of their product at checkout. Set the fee and the label displayed on the checkbox.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Energize Fee (₹)</label>
+                    <input type="number" name="energize_cost" value="{{ old('energize_cost', $settings['energize_cost'] ?? '0') }}" step="1" min="0"
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue"
+                           placeholder="e.g. 199">
+                    <p class="text-xs text-gray-400 mt-1">Set to 0 to offer energization for free. Leave blank to disable the option entirely.</p>
+                    @error('energize_cost')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Checkbox Label</label>
+                    <input type="text" name="energize_label" value="{{ old('energize_label', $settings['energize_label'] ?? 'Energize my product with sacred mantras & intentions') }}"
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue"
+                           placeholder="e.g. Energize my product with sacred mantras & intentions">
+                    <p class="text-xs text-gray-400 mt-1">Text shown next to the energize checkbox on the checkout page.</p>
+                    @error('energize_label')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Order Email -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 class="text-lg font-venlury font-semibold text-royal-blue mb-1">Admin Notifications</h2>
+            <p class="text-sm text-gray-500 mb-6">Email address that receives order confirmation copies</p>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Admin Order Email</label>
+                <input type="email" name="admin_order_email" value="{{ old('admin_order_email', $settings['admin_order_email'] ?? '') }}"
+                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-royal-blue focus:border-royal-blue"
+                       placeholder="e.g. orders@divineraksha.com">
+                @error('admin_order_email')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+
         <!-- Submit -->
         <div class="flex items-center gap-3">
             <button type="submit" class="px-6 py-2.5 bg-royal-blue text-white text-sm font-medium rounded-lg hover:bg-deep-royal transition-colors">
