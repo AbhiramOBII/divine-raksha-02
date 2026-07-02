@@ -139,6 +139,7 @@
                             <label class="flex items-start gap-3 cursor-pointer group p-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 hover:border-amber-300 transition-colors">
                                 <input type="checkbox" name="energize_product" value="1"
                                        x-model="energize"
+                                       @change="toggleEnergize()"
                                        class="mt-0.5 w-4 h-4 text-amber-500 border-amber-300 rounded focus:ring-amber-400 cursor-pointer flex-shrink-0">
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-1.5 mb-0.5">
@@ -299,9 +300,14 @@
             return {
                 processing: false,
                 errorMessage: '',
-                energize: false,
+                energize: localStorage.getItem('energize_selected') === 'true',
                 energizeCost: energizeCost,
                 baseTotal: baseTotal,
+
+                toggleEnergize() {
+                    this.energize = !this.energize;
+                    localStorage.setItem('energize_selected', this.energize);
+                },
 
                 displayTotal() {
                     const total = this.baseTotal + (this.energize ? this.energizeCost : 0);
@@ -340,6 +346,9 @@
                             this.processing = false;
                             return;
                         }
+
+                        // Clear energize choice after order placed
+                        localStorage.removeItem('energize_selected');
 
                         // Handle COD - redirect to success
                         if (data.payment_method === 'cod') {

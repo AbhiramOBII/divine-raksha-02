@@ -31,6 +31,9 @@
     <meta property="og:title" content="{{ $seoTitle }}">
     <meta property="og:description" content="{{ $seoDescription }}">
     <meta property="og:image" content="{{ $seoImage }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:url" content="{{ $seoCanonical }}">
     <meta property="og:site_name" content="{{ setting('site_name', 'Divine Raksha') }}">
     <meta property="og:locale" content="en_IN">
@@ -217,6 +220,16 @@
         .badge-pop { animation: badgePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         .cart-glow { animation: cartGlow 0.8s ease-out; border-radius: 50%; }
         .success-pulse { animation: successPulse 0.8s ease-out; }
+        .marquee-container { width: 100%; overflow: hidden; }
+        .marquee-content {
+            display: inline-flex;
+            animation: marquee-scroll 30s linear infinite;
+        }
+        .marquee-content:hover { animation-play-state: paused; }
+        @keyframes marquee-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
     </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
@@ -298,6 +311,31 @@
 
     <!-- Header -->
     <header class="relative z-50">
+        <!-- Offer Marquee -->
+        @if(setting('marquee_enabled') == '1' && setting('marquee_text'))
+        <div class="bg-gradient-to-r from-sacred-gold via-yellow-500 to-sacred-gold overflow-hidden">
+            <div class="marquee-container py-2">
+                <div class="marquee-content">
+                    @php
+                        $messages = array_map('trim', explode('|', setting('marquee_text')));
+                    @endphp
+                    @foreach($messages as $msg)
+                        <span class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-900 whitespace-nowrap px-8">
+                            <span class="text-divine-red">&#9733;</span>
+                            {{ $msg }}
+                        </span>
+                    @endforeach
+                    @foreach($messages as $msg)
+                        <span class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-900 whitespace-nowrap px-8">
+                            <span class="text-divine-red">&#9733;</span>
+                            {{ $msg }}
+                        </span>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Top Bar -->
         <div class="bg-[#cc1b1a] border-b border-sacred-gold/20">
             <div class="container max-w-7xl mx-auto px-4 sm:px-6 py-2">

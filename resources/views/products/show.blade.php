@@ -1,17 +1,33 @@
 @php
-    $seoTitle = $product->name . ' | ' . setting('site_name', 'Divine Raksha');
-    $seoDescription = Str::limit(strip_tags($product->short_description ?? ($product->description ?? '')), 160);
+    $seoTitle = ($product->meta_title ?: $product->title) . ' | ' . setting('site_name', 'Divine Raksha');
+    $seoDescription = Str::limit(strip_tags($product->meta_description ?: ($product->short_description ?? ($product->full_description ?? ''))), 160);
     $seoType = 'product';
-    $seoImage = $product->images && count($product->images) > 0 ? asset('storage/' . $product->images[0]) : asset('images/og-default.jpg');
+
+    // Use featured_image first, fall back to first gallery image, then default OG
+    if ($product->featured_image) {
+        $seoImage = asset('storage/' . $product->featured_image);
+    } elseif ($product->gallery_images && count($product->gallery_images) > 0) {
+        $seoImage = asset('storage/' . $product->gallery_images[0]);
+    } else {
+        $seoImage = asset('images/og-default.jpg');
+    }
+
     $seoCanonical = route('products.show', $product);
+
+    // Schema.org images array
+    $schemaImages = [];
+    if ($product->featured_image) $schemaImages[] = asset('storage/' . $product->featured_image);
+    if ($product->gallery_images) foreach ($product->gallery_images as $img) $schemaImages[] = asset('storage/' . $img);
+    if (empty($schemaImages)) $schemaImages[] = asset('images/og-default.jpg');
+
     $seoSchema = '<script type="application/ld+json">' . json_encode([
         '@context' => 'https://schema.org',
         '@type' => 'Product',
-        'name' => $product->name ?? $product->title,
+        'name' => $product->title,
         'description' => $seoDescription,
-        'image' => $seoImage,
+        'image' => $schemaImages,
         'brand' => ['@type' => 'Brand', 'name' => setting('site_name', 'Divine Raksha')],
-        'offers' => ['@type' => 'Offer', 'priceCurrency' => 'INR', 'price' => $product->selling_price, 'availability' => 'https://schema.org/InStock', 'url' => $seoCanonical],
+        'offers' => ['@type' => 'Offer', 'priceCurrency' => 'INR', 'price' => (string) $product->selling_price, 'availability' => 'https://schema.org/InStock', 'url' => $seoCanonical],
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>';
 @endphp
 
@@ -192,6 +208,51 @@
                                 ♡ Wishlist
                             </button>
                         </div>
+
+                        @if(setting('energize_cost') !== null)
+                        <!-- Energise Your Product - Product Page -->
+                        <div x-data="{
+                                energize: localStorage.getItem('energize_selected') === 'true',
+                                cost: {{ (float) setting('energize_cost', 0) }},
+                                toggle() {
+                                    this.energize = !this.energize;
+                                    localStorage.setItem('energize_selected', this.energize);
+                                }
+                            }"
+                            @click="toggle()"
+                            :class="energize ? 'border-amber-400 bg-gradient-to-r from-amber-50 to-orange-50 shadow-md' : 'border-amber-200 bg-white hover:border-amber-300 hover:bg-amber-50/40'"
+                            class="cursor-pointer rounded-2xl border-2 p-4 transition-all duration-200 select-none">
+                            <div class="flex items-center gap-3">
+                                <!-- Icon -->
+                                <div :class="energize ? 'bg-amber-400' : 'bg-amber-100'" class="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-colors">
+                                    <svg :class="energize ? 'text-white' : 'text-amber-500'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+                                    </svg>
+                                </div>
+                                <!-- Text -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="text-sm font-bold text-gray-900">⚡ Energise Your Product</span>
+                                        @if((float) setting('energize_cost', 0) > 0)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700">+₹{{ number_format((float) setting('energize_cost', 0)) }}</span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">FREE</span>
+                                        @endif
+                                        <!-- Selected badge -->
+                                        <span x-show="energize" x-cloak class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-green-500 text-white">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                            Added
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-0.5 leading-snug">{{ setting('energize_label', 'Energize my product with sacred mantras & intentions') }}</p>
+                                </div>
+                                <!-- Toggle indicator -->
+                                <div :class="energize ? 'bg-amber-400' : 'bg-gray-200'" class="flex-shrink-0 w-10 h-6 rounded-full relative transition-colors duration-200">
+                                    <div :class="energize ? 'translate-x-4 bg-white' : 'translate-x-0.5 bg-white'" class="absolute top-0.5 w-5 h-5 rounded-full shadow transition-transform duration-200"></div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
 
                         <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-600">
                             <div class="flex items-center">
