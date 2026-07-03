@@ -175,6 +175,19 @@
         }
     </script>
 
+    <!-- Bulk Actions Bar -->
+    <div id="bulk-bar" class="hidden mb-3 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-5 py-3">
+        <span class="text-sm font-semibold text-amber-800" id="selected-count">0 selected</span>
+        <a id="btn-print-addresses"
+           href="#"
+           target="_blank"
+           class="inline-flex items-center gap-2 px-4 py-2 bg-royal-blue text-white text-sm font-semibold rounded-lg hover:bg-deep-royal transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Print Addresses
+        </a>
+        <button onclick="clearSelection()" class="text-xs text-amber-700 underline ml-auto">Clear selection</button>
+    </div>
+
     <!-- Orders Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         @if($orders->count() > 0)
@@ -182,6 +195,10 @@
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
+                            <th class="px-4 py-3">
+                                <input type="checkbox" id="select-all" onchange="toggleAll(this)"
+                                       class="w-4 h-4 text-royal-blue border-gray-300 rounded cursor-pointer">
+                            </th>
                             <th class="text-left px-6 py-3 font-medium text-gray-600">Order #</th>
                             <th class="text-left px-6 py-3 font-medium text-gray-600">Customer</th>
                             <th class="text-left px-6 py-3 font-medium text-gray-600">Items</th>
@@ -195,7 +212,11 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach($orders as $order)
-                            <tr class="hover:bg-gray-50 transition-colors">
+                            <tr class="hover:bg-gray-50 transition-colors order-row">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" value="{{ $order->id }}" onchange="updateSelection()"
+                                           class="order-checkbox w-4 h-4 text-royal-blue border-gray-300 rounded cursor-pointer">
+                                </td>
                                 <td class="px-6 py-4">
                                     <a href="{{ route('admin.orders.show', $order) }}" class="font-semibold text-royal-blue hover:text-deep-royal">
                                         {{ $order->order_number }}
@@ -203,6 +224,14 @@
                                     @foreach($order->items as $item)
                                         <div class="text-xs text-gray-400 mt-0.5">{{ $item->product->title ?? 'N/A' }} × {{ $item->quantity }}</div>
                                     @endforeach
+                                    @if($order->address_printed_at)
+                                        <div class="mt-1">
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200" title="Printed on {{ $order->address_printed_at->format('d M Y, h:i A') }}">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                                Printed {{ $order->address_printed_at->diffForHumans() }}
+                                            </span>
+                                        </div>
+                                    @endif
                                     @if($order->energize_fee > 0)
                                         <div class="mt-1">
                                             <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">
@@ -319,4 +348,40 @@
             </div>
         @endif
     </div>
+<script>
+    const printBase = '{{ route('admin.orders.printAddresses') }}';
+
+    function getChecked() {
+        return Array.from(document.querySelectorAll('.order-checkbox:checked')).map(cb => cb.value);
+    }
+
+    function updateSelection() {
+        const ids = getChecked();
+        const bar = document.getElementById('bulk-bar');
+        const count = document.getElementById('selected-count');
+        const btn = document.getElementById('btn-print-addresses');
+        if (ids.length > 0) {
+            bar.classList.remove('hidden');
+            bar.classList.add('flex');
+            count.textContent = ids.length + ' selected';
+            btn.href = printBase + '?ids=' + ids.join(',');
+        } else {
+            bar.classList.add('hidden');
+            bar.classList.remove('flex');
+        }
+        const all = document.querySelectorAll('.order-checkbox');
+        document.getElementById('select-all').checked = all.length > 0 && ids.length === all.length;
+    }
+
+    function toggleAll(master) {
+        document.querySelectorAll('.order-checkbox').forEach(cb => cb.checked = master.checked);
+        updateSelection();
+    }
+
+    function clearSelection() {
+        document.querySelectorAll('.order-checkbox').forEach(cb => cb.checked = false);
+        document.getElementById('select-all').checked = false;
+        updateSelection();
+    }
+</script>
 @endsection

@@ -328,4 +328,21 @@ class OrderController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    public function printAddresses(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|string',
+        ]);
+
+        $ids = array_filter(array_map('intval', explode(',', $request->ids)));
+
+        $orders = Order::with('items.product')
+            ->whereIn('id', $ids)
+            ->get();
+
+        Order::whereIn('id', $ids)->update(['address_printed_at' => now()]);
+
+        return view('admin.orders.print-addresses', compact('orders'));
+    }
 }

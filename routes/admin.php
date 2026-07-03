@@ -56,6 +56,7 @@ Route::middleware('admin.auth')->group(function () {
     Route::patch('orders/{order}/shipping', [OrderController::class, 'updateShipping'])->name('admin.orders.updateShipping');
     Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
     Route::get('orders-export/csv', [OrderController::class, 'exportCsv'])->name('admin.orders.exportCsv');
+    Route::get('orders-print/addresses', [OrderController::class, 'printAddresses'])->name('admin.orders.printAddresses');
 
     // Blog Categories
     Route::resource('blog-categories', BlogCategoryController::class)->except(['show'])->names('admin.blog-categories');

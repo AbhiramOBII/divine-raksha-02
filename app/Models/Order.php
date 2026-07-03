@@ -41,6 +41,7 @@ class Order extends Model
         'razorpay_payment_id',
         'razorpay_signature',
         'notes',
+        'address_printed_at',
     ];
 
     protected function casts(): array
@@ -52,6 +53,7 @@ class Order extends Model
             'coupon_discount' => 'decimal:2',
             'energize_fee' => 'decimal:2',
             'total' => 'decimal:2',
+            'address_printed_at' => 'datetime',
         ];
     }
 
