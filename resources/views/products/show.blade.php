@@ -297,8 +297,8 @@
                     <!-- Description Tab -->
                     <div x-show="tab === 'description'" class="space-y-6">
                         <h3 class="text-2xl font-venlury font-bold text-royal-blue mb-4">{{ $product->title }}</h3>
-                        <div class="text-gray-600 leading-relaxed space-y-4">
-                            {!! nl2br(e($product->full_description)) !!}
+                        <div class="prose prose-blue max-w-none text-gray-600 leading-relaxed space-y-4">
+                            {!! $product->full_description !!}
                         </div>
                         @if($product->shop_purpose && count($product->shop_purpose) > 0)
                             <h4 class="text-lg font-semibold text-royal-blue mb-3 mt-6">Spiritual Benefits:</h4>
