@@ -344,7 +344,7 @@ class OrderController extends Controller
         Order::whereIn('id', $ids)->update(['address_printed_at' => now()]);
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.orders.print-addresses', compact('orders'))
-            ->setPaper('a4', 'landscape')
+            ->setPaper('a4', 'portrait')
             ->setOption(['margin_top' => 0, 'margin_bottom' => 0, 'margin_left' => 0, 'margin_right' => 0]);
 
         $filename = 'address-labels-' . now()->format('Y-m-d') . '.pdf';

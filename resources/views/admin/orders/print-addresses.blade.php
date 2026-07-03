@@ -25,9 +25,9 @@
 
         td.label-cell {
             width: 100%;
-            height: 190px;
+            height: 270px;
             border: 1pt solid #000;
-            padding: 10px 14px 8px 14px;
+            padding: 12px 18px 10px 18px;
             vertical-align: top;
             overflow: hidden;
         }
@@ -58,16 +58,16 @@
     @endphp
     <tr>
         <td class="label-cell">
-            <div style="font-size:14pt;font-weight:bold;letter-spacing:1pt;text-transform:uppercase;margin-bottom:4px;">Divine Raksha</div>
-            <div style="font-size:9pt;font-weight:bold;text-transform:uppercase;margin-bottom:1px;">To:</div>
-            <div style="font-size:13pt;font-weight:bold;margin-bottom:2px;">{{ $order->customer_name }}</div>
-            <div style="font-size:11pt;font-weight:bold;margin-bottom:2px;">ORDER: {{ $order->order_number }}</div>
-            <div style="font-size:10.5pt;line-height:1.35;margin-bottom:3px;">{{ $fullAddress }}</div>
-            <div style="font-size:11pt;font-weight:bold;margin-bottom:4px;">Mobile: {{ $order->customer_phone }}</div>
-            <div style="border-top:1pt dashed #555;margin-bottom:4px;"></div>
-            <div style="font-size:9pt;font-weight:bold;text-transform:uppercase;margin-bottom:2px;">Product Details</div>
-            <div style="font-size:11pt;">{!! $skus !!}</div>
-            <div style="font-size:9pt;font-style:italic;color:#555;text-align:right;margin-top:4px;">Thank you for shopping from Divine Raksha, Bengaluru</div>
+            <div style="font-size:16pt;font-weight:bold;letter-spacing:1.5pt;text-transform:uppercase;margin-bottom:5px;">Divine Raksha</div>
+            <div style="font-size:9pt;font-weight:bold;text-transform:uppercase;letter-spacing:0.5pt;margin-bottom:2px;">To:</div>
+            <div style="font-size:15pt;font-weight:bold;margin-bottom:3px;">{{ $order->customer_name }}</div>
+            <div style="font-size:11pt;font-weight:bold;margin-bottom:3px;">ORDER: {{ $order->order_number }}</div>
+            <div style="font-size:11pt;line-height:1.45;margin-bottom:3px;">{{ $fullAddress }}</div>
+            <div style="font-size:12pt;font-weight:bold;margin-bottom:5px;">Mobile: {{ $order->customer_phone }}</div>
+            <div style="border-top:1.5pt dashed #444;margin-bottom:5px;"></div>
+            <div style="font-size:9pt;font-weight:bold;text-transform:uppercase;letter-spacing:0.5pt;margin-bottom:3px;">Product Details</div>
+            <div style="font-size:12pt;">{!! $skus !!}</div>
+            <div style="font-size:9pt;font-style:italic;color:#555;text-align:right;margin-top:5px;">Thank you for shopping from Divine Raksha, Bengaluru</div>
         </td>
     </tr>
     @endforeach
